@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="lb">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Training Guy - Trainer</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Training Guy">
+<meta name="theme-color" content="#0f6e56">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-512.png">
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 24px 16px 48px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #f7f6f2;
+    color: #1a1a18;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; }
+  h1 { font-size: 20px; font-weight: 600; margin: 0 0 4px; }
+  h2 { font-size: 15px; font-weight: 600; margin: 32px 0 12px; }
+  .sub { color: #6b6a64; font-size: 14px; margin: 0 0 24px; }
+  .tag { display: inline-block; background: #eeedfe; color: #3c3489; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; margin-bottom: 16px; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap: 10px; margin-bottom: 8px; }
+  .stat { background: #efeee8; border-radius: 10px; padding: 14px; }
+  .stat .label { font-size: 12px; color: #6b6a64; margin: 0 0 4px; }
+  .stat .value { font-size: 22px; font-weight: 600; margin: 0; }
+  .stat .note { font-size: 11px; color: #8a8983; margin: 4px 0 0; }
+  .days { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap: 10px; }
+  .day { background: #ffffff; border: 1px solid #e3e1d9; border-left: 4px solid #c3c2b7; border-radius: 12px; padding: 14px; }
+  .day.main { box-shadow: 0 0 0 2px #378add inset; }
+  .day-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+  .day-name { font-weight: 600; font-size: 13px; }
+  .badge { background: #e6f1fb; color: #0c447c; font-size: 11px; padding: 2px 8px; border-radius: 6px; }
+  .type { display: inline-block; font-size: 10.5px; font-weight: 600; padding: 2px 8px; border-radius: 20px; margin-bottom: 6px; }
+  .type-laaf { background: #e1f5ee; color: #085041; }
+  .type-kraft { background: #eeedfe; color: #3c3489; }
+  .type-velo { background: #faeeda; color: #854f0b; }
+  .type-rescht { background: #f1efe8; color: #5f5e5a; }
+  .day.laaf { border-left-color: #1d9e75; }
+  .day.kraft { border-left-color: #7f77dd; }
+  .day.velo { border-left-color: #ef9f27; }
+  .day.rescht { border-left-color: #b4b2a9; }
+  .desc { font-size: 13px; color: #4a4944; line-height: 1.5; white-space: pre-line; }
+  .result { margin-top: 8px; padding-top: 8px; border-top: 1px dashed #e3e1d9; font-size: 12px; font-weight: 600; }
+  .result-done { color: #085041; }
+  .result-off { color: #a32d2d; }
+  .result-note { display: block; font-weight: 400; color: #8a8983; margin-top: 2px; }
+  details.week { background: #ffffff; border: 1px solid #e3e1d9; border-radius: 12px; margin-bottom: 10px; overflow: hidden; }
+  details.week summary { cursor: pointer; list-style: none; padding: 14px 16px; font-weight: 600; font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
+  details.week summary::-webkit-details-marker { display: none; }
+  details.week summary .arrow { transition: transform 0.15s; color: #8a8983; font-size: 12px; }
+  details.week[open] summary .arrow { transform: rotate(90deg); }
+  details.week .days { padding: 0 16px 16px; }
+  .card { background: #ffffff; border: 1px solid #e3e1d9; border-radius: 12px; padding: 16px; }
+  .empty { color: #8a8983; font-size: 13px; padding: 20px 0; text-align: center; }
+  footer { text-align: center; font-size: 12px; color: #a3a29c; margin-top: 32px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Training Guy</h1>
+  <p class="sub">Iwwersiicht fir den Trainer &middot; nëmmen liesen</p>
+  <span class="tag">Trainer-Usiicht</span>
+
+  <div class="stats">
+    <div class="stat">
+      <p class="label">Sessiounen</p>
+      <p class="value">7</p>
+    </div>
+    <div class="stat">
+      <p class="label">Laafdeeg</p>
+      <p class="value">4</p>
+    </div>
+    <div class="stat">
+      <p class="label">Haaptsessiounen</p>
+      <p class="value">2</p>
+      <p class="note">Mëttwoch + Freideg, 18:00</p>
+    </div>
+  </div>
+
+  <div class="days" style="margin-top:16px;">
+    <div class="day laaf">
+      <div class="day-head"><span class="day-name">Méindeg</span></div>
+      <span class="type type-laaf">Laafen</span>
+      <div class="desc">50 min easy jogg + 5x100m strides</div>
+      <div class="result result-off">Ausgelooss - Krank<span class="result-note">Kappwéi an Halsweh</span></div>
+    </div>
+    <div class="day kraft">
+      <div class="day-head"><span class="day-name">Dënschdeg</span></div>
+      <span class="type type-kraft">Kraft</span>
+      <div class="desc">15 min warm up + Kraft</div>
+      <div class="result result-off">Ausgelooss - Krank</div>
+    </div>
+    <div class="day laaf main">
+      <div class="day-head"><span class="day-name">Mëttwoch</span><span class="badge">18:00</span></div>
+      <span class="type type-laaf">Laafen</span>
+      <div class="desc">4km
+6-7x1000m (60s)
+2km</div>
+      <div class="result result-off">Ausgelooss - Krank</div>
+    </div>
+    <div class="day rescht">
+      <div class="day-head"><span class="day-name">Donneschdeg</span></div>
+      <span class="type type-rescht">Rescht</span>
+      <div class="desc">Fräi oder Schwammen</div>
+      <div class="result result-done">Gemaach - Rad (Training)<span class="result-note">26,52 km &middot; 1:17:17 &middot; 77m Héicht<br>HF 91-125 (&#216; 104) &middot; Gefill 3/5<br>net mi krank, liichten Kappwéi</span></div>
+    </div>
+    <div class="day laaf main">
+      <div class="day-head"><span class="day-name">Freideg</span><span class="badge">18:00</span></div>
+      <span class="type type-laaf">Laafen</span>
+      <div class="desc">4km, 8min threshold, 90s
+4x60s hills, 90s
+6min threshold, 90s
+5x50s hills, 2km</div>
+    </div>
+    <div class="day velo">
+      <div class="day-head"><span class="day-name">Samschdeg</span></div>
+      <span class="type type-velo">Vëlo</span>
+      <div class="desc">Vëlo, bis zu 90 min</div>
+    </div>
+    <div class="day laaf">
+      <div class="day-head"><span class="day-name">Sonndeg</span></div>
+      <span class="type type-laaf">Laafen</span>
+      <div class="desc">12km Laf</div>
+    </div>
+  </div>
+
+  <h2>Archiv</h2>
+  <details class="week" open>
+    <summary>6. - 12. Juli 2026 <span class="arrow">&#9656;</span></summary>
+    <div class="days">
+      <div class="day laaf"><div class="day-head"><span class="day-name">Méindeg</span></div><span class="type type-laaf">Laafen</span><div class="desc">50 min easy jogg + 5x100m strides</div><div class="result result-off">Ausgelooss - Krank<span class="result-note">Kappwéi an Halsweh</span></div></div>
+      <div class="day kraft"><div class="day-head"><span class="day-name">Dënschdeg</span></div><span class="type type-kraft">Kraft</span><div class="desc">15 min warm up + Kraft</div><div class="result result-off">Ausgelooss - Krank</div></div>
+      <div class="day laaf main"><div class="day-head"><span class="day-name">Mëttwoch</span><span class="badge">18:00</span></div><span class="type type-laaf">Laafen</span><div class="desc">4km
+6-7x1000m (60s)
+2km</div><div class="result result-off">Ausgelooss - Krank</div></div>
+      <div class="day rescht"><div class="day-head"><span class="day-name">Donneschdeg</span></div><span class="type type-rescht">Rescht</span><div class="desc">Fräi oder Schwammen</div><div class="result result-done">Gemaach - Rad (Training)<span class="result-note">26,52 km &middot; 1:17:17 &middot; 77m Héicht<br>HF 91-125 (&#216; 104) &middot; Gefill 3/5<br>net mi krank, liichten Kappwéi</span></div></div>
+      <div class="day laaf main"><div class="day-head"><span class="day-name">Freideg</span><span class="badge">18:00</span></div><span class="type type-laaf">Laafen</span><div class="desc">4km, 8min threshold, 90s
+4x60s hills, 90s
+6min threshold, 90s
+5x50s hills, 2km</div></div>
+      <div class="day velo"><div class="day-head"><span class="day-name">Samschdeg</span></div><span class="type type-velo">Vëlo</span><div class="desc">Vëlo, bis zu 90 min</div></div>
+      <div class="day laaf"><div class="day-head"><span class="day-name">Sonndeg</span></div><span class="type type-laaf">Laafen</span><div class="desc">12km Laf</div></div>
+    </div>
+  </details>
+
+  <h2>Auswertung / Resultater</h2>
+  <div class="stats">
+    <div class="stat">
+      <p class="label">Gemaach</p>
+      <p class="value">1/4</p>
+      <p class="note">vun de leschte 4 Deeg</p>
+    </div>
+    <div class="stat">
+      <p class="label">Ausgelooss</p>
+      <p class="value">3</p>
+      <p class="note">Grond: Krank</p>
+    </div>
+    <div class="stat">
+      <p class="label">Distanz Woch</p>
+      <p class="value">26,5 km</p>
+    </div>
+    <div class="stat">
+      <p class="label">&#216; Häerzfrequenz</p>
+      <p class="value">104</p>
+      <p class="note">91-125 bpm</p>
+    </div>
+    <div class="stat">
+      <p class="label">&#216; Gefill</p>
+      <p class="value">3/5</p>
+    </div>
+  </div>
+  <p class="empty">Gëtt all Woch mat den neie Resultater aktualiséiert.</p>
+
+  <footer>Training Guy &middot; Trainer-Usiicht &middot; gëtt all Woch aktualiséiert</footer>
+</div>
+</body>
+</html>
