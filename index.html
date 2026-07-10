@@ -1,1 +1,299 @@
-&lt;!DOCTYPE html&gt;
+<!DOCTYPE html>
+<html lang="lb">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Training Guy</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Training Guy">
+<meta name="theme-color" content="#0f6e56">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-512.png">
+<link rel="manifest" href="manifest.json">
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 24px 16px 48px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #f7f6f2;
+    color: #1a1a18;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; }
+  h1 { font-size: 20px; font-weight: 600; margin: 0 0 4px; }
+  h2 { font-size: 15px; font-weight: 600; margin: 32px 0 12px; }
+  .sub { color: #6b6a64; font-size: 14px; margin: 0 0 24px; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap: 10px; margin-bottom: 8px; }
+  .stat { background: #efeee8; border-radius: 10px; padding: 14px; }
+  .stat .label { font-size: 12px; color: #6b6a64; margin: 0 0 4px; }
+  .stat .value { font-size: 22px; font-weight: 600; margin: 0; }
+  .stat .note { font-size: 11px; color: #8a8983; margin: 4px 0 0; }
+  .days { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap: 10px; }
+  .day { background: #ffffff; border: 1px solid #e3e1d9; border-left: 4px solid #c3c2b7; border-radius: 12px; padding: 14px; }
+  .day.main { border-color: #e3e1d9; box-shadow: 0 0 0 2px #378add inset; }
+  .day-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+  .day-name { font-weight: 600; font-size: 13px; }
+  .badge { background: #e6f1fb; color: #0c447c; font-size: 11px; padding: 2px 8px; border-radius: 6px; }
+  .type { display: inline-block; font-size: 10.5px; font-weight: 600; padding: 2px 8px; border-radius: 20px; margin-bottom: 6px; }
+  .type-laaf { background: #e1f5ee; color: #085041; }
+  .type-kraft { background: #eeedfe; color: #3c3489; }
+  .type-velo { background: #faeeda; color: #854f0b; }
+  .type-rescht { background: #f1efe8; color: #5f5e5a; }
+  .day.laaf { border-left-color: #1d9e75; }
+  .day.kraft { border-left-color: #7f77dd; }
+  .day.velo { border-left-color: #ef9f27; }
+  .day.rescht { border-left-color: #b4b2a9; }
+  .desc { font-size: 13px; color: #4a4944; line-height: 1.5; white-space: pre-line; }
+  .result { margin-top: 8px; padding-top: 8px; border-top: 1px dashed #e3e1d9; font-size: 12px; font-weight: 600; }
+  .result-done { color: #085041; }
+  .result-off { color: #a32d2d; }
+  .result-note { display: block; font-weight: 400; color: #8a8983; margin-top: 2px; }
+  details.week { background: #ffffff; border: 1px solid #e3e1d9; border-radius: 12px; margin-bottom: 10px; overflow: hidden; }
+  details.week summary { cursor: pointer; list-style: none; padding: 14px 16px; font-weight: 600; font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
+  details.week summary::-webkit-details-marker { display: none; }
+  details.week summary .arrow { transition: transform 0.15s; color: #8a8983; font-size: 12px; }
+  details.week[open] summary .arrow { transform: rotate(90deg); }
+  details.week .days { padding: 0 16px 16px; }
+  .card { background: #ffffff; border: 1px solid #e3e1d9; border-radius: 12px; padding: 16px; }
+  .btn { display: inline-block; background: #378add; color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 600; padding: 10px 18px; border-radius: 8px; }
+  .empty { color: #8a8983; font-size: 13px; padding: 20px 0; text-align: center; }
+  iframe.jotform { width: 100%; border: none; min-height: 540px; border-radius: 12px; }
+  footer { text-align: center; font-size: 12px; color: #a3a29c; margin-top: 32px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Training Guy</h1>
+  <p class="sub">Aktuell Woch: 6. - 12. Juli 2026</p>
+
+  <div class="card" style="margin-bottom:16px; font-size:12.5px; color:#6b6a64;">
+    <strong style="color:#1a1a18;">Um iPhone séier drukommen:</strong> Safari &rarr; Deel-Symbol (&#9634;&#8593;) &rarr; "Op Home-Bildschierm" &rarr; do ass en Icon fir dës Säit direkt opzemaachen, ouni Browser oder Link.
+  </div>
+
+  <div class="stats">
+    <div class="stat">
+      <p class="label">Sessiounen</p>
+      <p class="value">7</p>
+    </div>
+    <div class="stat">
+      <p class="label">Laafdeeg</p>
+      <p class="value">4</p>
+    </div>
+    <div class="stat">
+      <p class="label">Haaptsessiounen</p>
+      <p class="value">2</p>
+      <p class="note">Mëttwoch + Freideg, 18:00</p>
+    </div>
+  </div>
+
+  <div class="days" style="margin-top:16px;">
+    <div class="day laaf">
+      <div class="day-head"><span class="day-name">Méindeg</span></div>
+      <span class="type type-laaf">Laafen</span>
+      <div class="desc">50 min easy jogg + 5x100m strides</div>
+      <div class="result result-off">Ausgelooss - Krank<span class="result-note">Kappwéi an Halsweh</span></div>
+    </div>
+    <div class="day kraft">
+      <div class="day-head"><span class="day-name">Dënschdeg</span></div>
+      <span class="type type-kraft">Kraft</span>
+      <div class="desc">15 min warm up + Kraft</div>
+      <div class="result result-off">Ausgelooss - Krank</div>
+    </div>
+    <div class="day laaf main">
+      <div class="day-head"><span class="day-name">Mëttwoch</span><span class="badge">18:00</span></div>
+      <span class="type type-laaf">Laafen</span>
+      <div class="desc">4km
+6-7x1000m (60s)
+2km</div>
+      <div class="result result-off">Ausgelooss - Krank</div>
+    </div>
+    <div class="day rescht">
+      <div class="day-head"><span class="day-name">Donneschdeg</span></div>
+      <span class="type type-rescht">Rescht</span>
+      <div class="desc">Fräi oder Schwammen</div>
+      <div class="result result-done">Gemaach - Rad (Training)<span class="result-note">26,52 km &middot; 1:17:17 &middot; 77m Héicht<br>HF 91-125 (&#216; 104) &middot; Gefill 3/5<br>net mi krank, liichten Kappwéi</span></div>
+    </div>
+    <div class="day laaf main">
+      <div class="day-head"><span class="day-name">Freideg</span><span class="badge">18:00</span></div>
+      <span class="type type-laaf">Laafen</span>
+      <div class="desc">4km, 8min threshold, 90s
+4x60s hills, 90s
+6min threshold, 90s
+5x50s hills, 2km</div>
+      <div class="result result-done">Gemaach - Laafen (Warmup + Training)<span class="result-note">4,05 km + 6,19 km &middot; 23:27 + 36:20 &middot; 92m Héicht<br>HF 119-176 (&#216; 160) &middot; Gefill 3/5<br>gefällt ze séier &middot; schwéier</span></div>
+    </div>
+    <div class="day velo">
+      <div class="day-head"><span class="day-name">Samschdeg</span></div>
+      <span class="type type-velo">Vëlo</span>
+      <div class="desc">Vëlo, bis zu 90 min</div>
+    </div>
+    <div class="day laaf">
+      <div class="day-head"><span class="day-name">Sonndeg</span></div>
+      <span class="type type-laaf">Laafen</span>
+      <div class="desc">12km Laf</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+    <div>
+      <p style="font-weight:600; font-size:14px; margin:0 0 2px;">Kalenner fir dëss Woch</p>
+      <p style="font-size:12px; color:#8a8983; margin:0;">Direkt an de Kalenner (iPhone) oder als Fichier eroflueden</p>
+    </div>
+    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+      <button class="btn" style="border:none; cursor:pointer; background:#000000;" onclick="addToAppleCalendar()">
+        <i style="font-style:normal;">&#128197;</i> Bei iPhone derbäisetzen
+      </button>
+      <button class="btn" style="border:1px solid #d9d7cd; background:#ffffff; color:#1a1a18; cursor:pointer;" onclick="downloadICS()">Eroflueden (.ics)</button>
+    </div>
+  </div>
+
+  <h2>Archiv</h2>
+  <details class="week" open>
+    <summary>6. - 12. Juli 2026 <span class="arrow">&#9656;</span></summary>
+    <div class="days">
+      <div class="day laaf"><div class="day-head"><span class="day-name">Méindeg</span></div><span class="type type-laaf">Laafen</span><div class="desc">50 min easy jogg + 5x100m strides</div><div class="result result-off">Ausgelooss - Krank<span class="result-note">Kappwéi an Halsweh</span></div></div>
+      <div class="day kraft"><div class="day-head"><span class="day-name">Dënschdeg</span></div><span class="type type-kraft">Kraft</span><div class="desc">15 min warm up + Kraft</div><div class="result result-off">Ausgelooss - Krank</div></div>
+      <div class="day laaf main"><div class="day-head"><span class="day-name">Mëttwoch</span><span class="badge">18:00</span></div><span class="type type-laaf">Laafen</span><div class="desc">4km
+6-7x1000m (60s)
+2km</div><div class="result result-off">Ausgelooss - Krank</div></div>
+      <div class="day rescht"><div class="day-head"><span class="day-name">Donneschdeg</span></div><span class="type type-rescht">Rescht</span><div class="desc">Fräi oder Schwammen</div><div class="result result-done">Gemaach - Rad (Training)<span class="result-note">26,52 km &middot; 1:17:17 &middot; 77m Héicht<br>HF 91-125 (&#216; 104) &middot; Gefill 3/5<br>net mi krank, liichten Kappwéi</span></div></div>
+      <div class="day laaf main"><div class="day-head"><span class="day-name">Freideg</span><span class="badge">18:00</span></div><span class="type type-laaf">Laafen</span><div class="desc">4km, 8min threshold, 90s
+4x60s hills, 90s
+6min threshold, 90s
+5x50s hills, 2km</div><div class="result result-done">Gemaach - Laafen (Warmup + Training)<span class="result-note">4,05 km + 6,19 km &middot; 23:27 + 36:20 &middot; 92m Héicht<br>HF 119-176 (&#216; 160) &middot; Gefill 3/5<br>gefällt ze séier &middot; schwéier</span></div></div>
+      <div class="day velo"><div class="day-head"><span class="day-name">Samschdeg</span></div><span class="type type-velo">Vëlo</span><div class="desc">Vëlo, bis zu 90 min</div></div>
+      <div class="day laaf"><div class="day-head"><span class="day-name">Sonndeg</span></div><span class="type type-laaf">Laafen</span><div class="desc">12km Laf</div></div>
+    </div>
+  </details>
+  <p class="empty" id="archive-hint">Weider Wochen ginn hei automatesch derbäigesat.</p>
+
+  <h2>Resultater aginn</h2>
+  <div class="card" style="padding:0; overflow:hidden;">
+    <iframe class="jotform" src="https://form.jotform.com/261891471293060" title="Training Resultater Formulaire"></iframe>
+  </div>
+
+  <h2>Auswertung</h2>
+  <div class="stats">
+    <div class="stat">
+      <p class="label">Gemaach</p>
+      <p class="value">2/5</p>
+      <p class="note">vun de leschte 5 Deeg</p>
+    </div>
+    <div class="stat">
+      <p class="label">Ausgelooss</p>
+      <p class="value">3</p>
+      <p class="note">Grond: Krank</p>
+    </div>
+    <div class="stat">
+      <p class="label">Distanz Woch</p>
+      <p class="value">36,8 km</p>
+    </div>
+    <div class="stat">
+      <p class="label">&#216; Häerzfrequenz</p>
+      <p class="value">129</p>
+      <p class="note">91-176 bpm</p>
+    </div>
+    <div class="stat">
+      <p class="label">&#216; Gefill</p>
+      <p class="value">3/5</p>
+    </div>
+  </div>
+  <p class="empty">Gëtt all Woch mat den neie Resultater aktualiséiert.</p>
+
+  <footer>Training Guy &middot; gëtt all Woch aktualiséiert &middot; automatesch iwwer GitHub</footer>
+</div>
+<script>
+  var CURRENT_WEEK = {
+    label: "6. - 12. Juli 2026",
+    days: [
+      { date: "20260706", time: null, summary: "Laafen - 50 min easy jogg + 5x100m strides", desc: "50 min easy jogg + 5x100m strides" },
+      { date: "20260707", time: null, summary: "Kraft - 15 min warm up + Kraft", desc: "15 min warm up + Kraft" },
+      { date: "20260708", time: "180000", summary: "Laafen - Intervalle", desc: "4km\n6-7x1000m (60s Paus)\n2km" },
+      { date: "20260709", time: null, summary: "Fräi oder Schwammen", desc: "Fräi oder Schwammen" },
+      { date: "20260710", time: "180000", summary: "Laafen - Threshold + Hills", desc: "4km, 8min threshold, 90s\n4x60s hills, 90s\n6min threshold, 90s\n5x50s hills, 2km" },
+      { date: "20260711", time: null, summary: "Vëlo - bis zu 90 min", desc: "Vëlo (bis zu 90 min)" },
+      { date: "20260712", time: null, summary: "Laafen - 12km", desc: "12km" }
+    ]
+  };
+
+  function pad(n) { return n < 10 ? "0" + n : "" + n; }
+
+  function stampNow() {
+    var d = new Date();
+    return d.getUTCFullYear() + pad(d.getUTCMonth()+1) + pad(d.getUTCDate()) + "T" + pad(d.getUTCHours()) + pad(d.getUTCMinutes()) + pad(d.getUTCSeconds()) + "Z";
+  }
+
+  function buildICS() {
+    var stamp = stampNow();
+    var lines = [
+      "BEGIN:VCALENDAR",
+      "VERSION:2.0",
+      "PRODID:-//Guy//Training Plan//EN",
+      "CALSCALE:GREGORIAN",
+      "BEGIN:VTIMEZONE",
+      "TZID:Europe/Luxembourg",
+      "BEGIN:DAYLIGHT",
+      "TZOFFSETFROM:+0100",
+      "TZOFFSETTO:+0200",
+      "TZNAME:CEST",
+      "DTSTART:19700329T020000",
+      "RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU",
+      "END:DAYLIGHT",
+      "BEGIN:STANDARD",
+      "TZOFFSETFROM:+0200",
+      "TZOFFSETTO:+0100",
+      "TZNAME:CET",
+      "DTSTART:19701025T030000",
+      "RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU",
+      "END:STANDARD",
+      "END:VTIMEZONE"
+    ];
+    CURRENT_WEEK.days.forEach(function(day, i) {
+      lines.push("BEGIN:VEVENT");
+      lines.push("UID:training-" + day.date + "-" + i + "@guy");
+      lines.push("DTSTAMP:" + stamp);
+      if (day.time) {
+        var endHour = pad(parseInt(day.time.substring(0,2), 10) + 1);
+        var endTime = endHour + day.time.substring(2);
+        lines.push("DTSTART;TZID=Europe/Luxembourg:" + day.date + "T" + day.time);
+        lines.push("DTEND;TZID=Europe/Luxembourg:" + day.date + "T" + endTime);
+      } else {
+        var d = new Date(day.date.substring(0,4), parseInt(day.date.substring(4,6),10)-1, day.date.substring(6,8));
+        d.setDate(d.getDate()+1);
+        var nextDate = d.getFullYear() + pad(d.getMonth()+1) + pad(d.getDate());
+        lines.push("DTSTART;VALUE=DATE:" + day.date);
+        lines.push("DTEND;VALUE=DATE:" + nextDate);
+      }
+      lines.push("SUMMARY:" + day.summary);
+      lines.push("DESCRIPTION:" + day.desc);
+      lines.push("END:VEVENT");
+    });
+    lines.push("END:VCALENDAR");
+    return lines.join("\r\n");
+  }
+
+  function downloadICS() {
+    var blob = new Blob([buildICS()], { type: "text/calendar" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = "Training_Guy.ics";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+  }
+
+  function addToAppleCalendar() {
+    var blob = new Blob([buildICS()], { type: "text/calendar" });
+    var url = URL.createObjectURL(blob);
+    // No "download" attribute: iOS Safari recognizes text/calendar and
+    // opens the native "Add to Calendar" sheet instead of downloading.
+    window.location.href = url;
+    setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+  }
+</script>
+</body>
+</html>
