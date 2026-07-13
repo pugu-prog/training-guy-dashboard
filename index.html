@@ -82,6 +82,10 @@
     <strong style="color:#1a1a18;">Um iPhone séier drukommen:</strong> Safari &rarr; Deel-Symbol (&#9634;&#8593;) &rarr; "Op Home-Bildschierm" &rarr; do ass en Icon fir dës Säit direkt opzemaachen, ouni Browser oder Link.
   </div>
 
+  <div class="card" style="margin-bottom:16px; text-align:center;">
+    <p style="font-weight:700; font-size:15px; margin:0; color:#1a1a18;">Trainingsprogramm Guy, Woch 2</p>
+  </div>
+
   <div class="stats">
     <div class="stat">
       <p class="label">Sessiounen</p>
@@ -148,7 +152,7 @@ Fräi oder Schwammen</div>
       <p style="font-size:12px; color:#8a8983; margin:0;">Lued déi ganz Woch (all 7 Deeg) als eng .ics-Datei erof. Op iPhone: no dem Download d'Datei opmaachen a "All derbäisetzen" wielen, dann kommen all 7 Deeg op eemol an de Kalenner.</p>
     </div>
     <div style="display:flex; gap:8px; flex-wrap:wrap;">
-      <button class="btn" style="border:none; cursor:pointer; background:#378add;" onclick="downloadICS()">Kalenner eroflueden (.ics)</button>
+      <a class="btn" style="text-decoration:none;" href="training.ics" download="Training_Guy.ics">Kalenner eroflueden (.ics)</a>
     </div>
   </div>
 
@@ -237,87 +241,5 @@ Fräi oder Schwammen</div></div>
 
   <footer>Training Guy &middot; gëtt all Woch aktualiséiert &middot; automatesch iwwer GitHub</footer>
 </div>
-<script>
-  var CURRENT_WEEK = {
-    label: "13. - 19. Juli 2026",
-    days: [
-      { date: "20260713", time: null, summary: "Laafen + Kraft - 50 min easy jogg + 5x100m strides", desc: "50 min easy jogg + 5x100m strides\nKraft (Homegym)" },
-      { date: "20260714", time: null, summary: "Kraft - 15 min warm up + kraft", desc: "15 min warm up + kraft" },
-      { date: "20260715", time: "180000", summary: "Laafen - Intervalle", desc: "4km\n2x(1600-1200-800) (60s Paus)\n2km" },
-      { date: "20260716", time: null, summary: "Homegym / Fräi oder Schwammen", desc: "Homegym\nFräi oder Schwammen" },
-      { date: "20260717", time: "180000", summary: "Laafen - Hills", desc: "4km\n3x5x60s hills (90s Paus)\n2km" },
-      { date: "20260718", time: null, summary: "Vëlo - 2 Stonnen", desc: "Vëlo, 2 Stonnen" },
-      { date: "20260719", time: null, summary: "Laafen - 10km + Strides", desc: "10km + Strides" }
-    ]
-  };
-
-  function pad(n) { return n < 10 ? "0" + n : "" + n; }
-
-  function stampNow() {
-    var d = new Date();
-    return d.getUTCFullYear() + pad(d.getUTCMonth()+1) + pad(d.getUTCDate()) + "T" + pad(d.getUTCHours()) + pad(d.getUTCMinutes()) + pad(d.getUTCSeconds()) + "Z";
-  }
-
-  function buildICS() {
-    var stamp = stampNow();
-    var lines = [
-      "BEGIN:VCALENDAR",
-      "VERSION:2.0",
-      "PRODID:-//Guy//Training Plan//EN",
-      "CALSCALE:GREGORIAN",
-      "BEGIN:VTIMEZONE",
-      "TZID:Europe/Luxembourg",
-      "BEGIN:DAYLIGHT",
-      "TZOFFSETFROM:+0100",
-      "TZOFFSETTO:+0200",
-      "TZNAME:CEST",
-      "DTSTART:19700329T020000",
-      "RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU",
-      "END:DAYLIGHT",
-      "BEGIN:STANDARD",
-      "TZOFFSETFROM:+0200",
-      "TZOFFSETTO:+0100",
-      "TZNAME:CET",
-      "DTSTART:19701025T030000",
-      "RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU",
-      "END:STANDARD",
-      "END:VTIMEZONE"
-    ];
-    CURRENT_WEEK.days.forEach(function(day, i) {
-      lines.push("BEGIN:VEVENT");
-      lines.push("UID:training-" + day.date + "-" + i + "@guy");
-      lines.push("DTSTAMP:" + stamp);
-      if (day.time) {
-        var endHour = pad(parseInt(day.time.substring(0,2), 10) + 1);
-        var endTime = endHour + day.time.substring(2);
-        lines.push("DTSTART;TZID=Europe/Luxembourg:" + day.date + "T" + day.time);
-        lines.push("DTEND;TZID=Europe/Luxembourg:" + day.date + "T" + endTime);
-      } else {
-        var d = new Date(day.date.substring(0,4), parseInt(day.date.substring(4,6),10)-1, day.date.substring(6,8));
-        d.setDate(d.getDate()+1);
-        var nextDate = d.getFullYear() + pad(d.getMonth()+1) + pad(d.getDate());
-        lines.push("DTSTART;VALUE=DATE:" + day.date);
-        lines.push("DTEND;VALUE=DATE:" + nextDate);
-      }
-      lines.push("SUMMARY:" + day.summary);
-      lines.push("DESCRIPTION:" + day.desc);
-      lines.push("END:VEVENT");
-    });
-    lines.push("END:VCALENDAR");
-    return lines.join("\r\n");
-  }
-
-  function downloadICS() {
-    var blob = new Blob([buildICS()], { type: "text/calendar" });
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement("a");
-    a.href = url;
-    a.download = "Training_Guy.ics";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
-  }
-</script>
 </body>
 </html>
