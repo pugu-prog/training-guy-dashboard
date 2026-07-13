@@ -69,6 +69,7 @@
   .empty { color: #8a8983; font-size: 13px; padding: 20px 0; text-align: center; }
   iframe.jotform { width: 100%; border: none; min-height: 540px; border-radius: 12px; }
   footer { text-align: center; font-size: 12px; color: #a3a29c; margin-top: 32px; }
+  .week-comment { padding: 0 16px; font-size: 13px; color: #4a4944; margin: 4px 0 12px; font-style: italic; }
 </style>
 </head>
 <body>
@@ -192,6 +193,7 @@ Fräi oder Schwammen</div></div>
   </details>
   <details class="week">
     <summary>Woch 1 &middot; 6. - 12. Juli 2026 <span class="arrow">&#9656;</span></summary>
+    <p class="week-comment">Dës Woch: 4 vun 7 Sessiounen gemaach, 3 ausgelooss wéinst Krankheet fir d'Woch unzefänken. Gesamt 84,4 km (2x Rad, 2x Laafen), &#216; Häerzfrequenz 131 bpm, &#216; Gefill 3/5. No der Krankheet koum d'Konditioun zréck, mä d'Freideg-Sessioun huet sech nach ze séier ugefillt.</p>
     <div class="days">
       <div class="day laaf"><div class="day-head"><span class="day-name">Méindeg</span></div><span class="type type-laaf">Laafen</span><div class="desc">50 min easy jogg + 5x100m strides</div><div class="result result-off">Ausgelooss - Krank<span class="result-note">Kappwéi an Halsweh</span></div></div>
       <div class="day kraft"><div class="day-head"><span class="day-name">Dënschdeg</span></div><span class="type type-kraft">Kraft</span><div class="desc">15 min warm up + Kraft</div><div class="result result-off">Ausgelooss - Krank</div></div>
@@ -208,6 +210,21 @@ Fräi oder Schwammen</div></div>
     </div>
   </details>
   <p class="empty" id="archive-hint">Weider Wochen ginn hei automatesch derbäigesat.</p>
+
+  <h2>Statistiken</h2>
+  <details class="week" id="statsDetails">
+    <summary>Kilometeren iwwert Zäit <span class="arrow">&#9656;</span></summary>
+    <div style="padding: 0 16px 16px;">
+      <div class="stats" style="margin-bottom:16px;">
+        <div class="stat">
+          <p class="label">Gesamt Stonnen</p>
+          <p class="value">5,2 h</p>
+          <p class="note">Woch 1</p>
+        </div>
+      </div>
+      <canvas id="kmChart" height="220"></canvas>
+    </div>
+  </details>
 
   <h2>Resultater aginn</h2>
   <div class="card" style="padding:0; overflow:hidden;">
@@ -244,5 +261,40 @@ Fräi oder Schwammen</div></div>
 
   <footer>Training Guy &middot; gëtt all Woch aktualiséiert &middot; automatesch iwwer GitHub</footer>
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script>
+  var WEEK_HISTORY = [
+    { label: "Woch 1", laafen: 24.5, velo: 59.9, total: 84.4 },
+    { label: "Woch 2", laafen: 0, velo: 0, total: 0 }
+  ];
+  (function () {
+    var details = document.getElementById('statsDetails');
+    var rendered = false;
+    function renderChart() {
+      if (rendered) return;
+      rendered = true;
+      var ctx = document.getElementById('kmChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: WEEK_HISTORY.map(function (w) { return w.label; }),
+          datasets: [
+            { label: 'Laafen', data: WEEK_HISTORY.map(function (w) { return w.laafen; }), borderColor: '#1d9e75', backgroundColor: '#1d9e75', tension: 0.2 },
+            { label: 'Vëlo', data: WEEK_HISTORY.map(function (w) { return w.velo; }), borderColor: '#ef9f27', backgroundColor: '#ef9f27', tension: 0.2 },
+            { label: 'Zesummen', data: WEEK_HISTORY.map(function (w) { return w.total; }), borderColor: '#378add', backgroundColor: '#378add', tension: 0.2, borderDash: [4, 4] }
+          ]
+        },
+        options: {
+          responsive: true,
+          scales: { y: { beginAtZero: true, title: { display: true, text: 'km' } } }
+        }
+      });
+    }
+    if (details.open) { renderChart(); }
+    details.addEventListener('toggle', function () {
+      if (details.open) { renderChart(); }
+    });
+  })();
+</script>
 </body>
 </html>
