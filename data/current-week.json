@@ -1,0 +1,14 @@
+{
+  "week_number": 2,
+  "week_label": "Woch 2",
+  "days": [
+    { "weekday": "Méindeg", "date": "20260713" },
+    { "weekday": "Dënschdeg", "date": "20260714" },
+    { "weekday": "Mëttwoch", "date": "20260715" },
+    { "weekday": "Donneschdeg", "date": "20260716" },
+    { "weekday": "Freideg", "date": "20260717" },
+    { "weekday": "Samschdeg", "date": "20260718" },
+    { "weekday": "Sonndeg", "date": "20260719" }
+  ],
+  "hours_baseline": 5.2
+}

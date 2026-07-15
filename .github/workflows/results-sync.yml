@@ -1,0 +1,42 @@
+name: Resultater-Sync
+
+on:
+  schedule:
+    # All 3 Stonnen, ronderëm d'Auer (UTC). Passt zu Guy senger fréierer
+    # Claude-Scheduled-Task-Kadenz, mä lääft elo gratis via GitHub Actions.
+    - cron: "0 */3 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repo auschecken
+        uses: actions/checkout@v4
+
+      - name: Python asrichten
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Sync lafen loossen
+        env:
+          JOTFORM_API_KEY: ${{ secrets.JOTFORM_API_KEY }}
+          REPO_ROOT: ${{ github.workspace }}
+        run: python3 sync_results.py
+
+      - name: Commit & push, wann eppes geännert huet
+        run: |
+          if [ -f .sync-changed ]; then
+            git config user.name "training-guy-bot"
+            git config user.email "actions@github.com"
+            git add index.html trainer.html
+            git commit -m "Resultater-Sync (automatesch via GitHub Actions)"
+            git push
+            rm -f .sync-changed
+          else
+            echo "Näischt geännert, kee Commit."
+          fi
