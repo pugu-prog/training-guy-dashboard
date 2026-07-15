@@ -153,6 +153,46 @@ def fmt_hms(total_seconds):
 PHASE_TAG = {"Warmup": "WU", "Training": "TR", "Cooldown": "CD"}
 
 
+def fmt_hf(hf_min, hf_max, hf_avg):
+    """Format an HF string for a single entry/segment. Min heart rate is no
+    longer collected in the form (hidden 2026-07-15), so this degrades
+    gracefully: min-max if both present, "bis max" if only max, just the
+    average if that's all there is, empty string if nothing at all."""
+    if hf_min and hf_max:
+        core = f"HF {hf_min}-{hf_max}"
+    elif hf_max:
+        core = f"HF bis {hf_max}"
+    elif hf_avg:
+        return f"HF &#216; {hf_avg}"
+    else:
+        return ""
+    return f"{core} (&#216; {hf_avg})" if hf_avg else core
+
+
+def fmt_hf_range(hf_mins, hf_maxs, hf_avgs):
+    """Same as fmt_hf but for an aggregated list of entries (e.g. one
+    activity's segments combined for a day)."""
+    avg = round(sum(hf_avgs) / len(hf_avgs)) if hf_avgs else None
+    if hf_mins and hf_maxs:
+        core = f"HF {int(min(hf_mins))}-{int(max(hf_maxs))}"
+    elif hf_maxs:
+        core = f"HF bis {int(max(hf_maxs))}"
+    elif avg is not None:
+        return f"HF &#216; {avg}"
+    else:
+        return ""
+    return f"{core} (&#216; {avg})" if avg is not None else core
+
+
+def fmt_hf_note(hf_min, hf_max):
+    """Weekly Auswertung stat note, same graceful-degradation logic."""
+    if hf_min is not None and hf_max is not None:
+        return f"{hf_min}-{hf_max} bpm"
+    if hf_max is not None:
+        return f"bis {hf_max} bpm"
+    return None
+
+
 def build_result_block(day_entries):
     """day_entries: list of parsed submissions for one date, all Status=Gemaach."""
     # Group by Aktivitéit (e.g. "Laafen", "Kraft", "Rad")
@@ -205,7 +245,7 @@ def build_result_block(day_entries):
             if e["bemierkung"]:
                 remarks.append(e["bemierkung"])
             tag = PHASE_TAG.get(e["phase"], e["phase"] or "")
-            hf = f"HF {e['hf_min']}-{e['hf_max']} (&#216; {e['hf_avg']})" if e["hf_min"] else ""
+            hf = fmt_hf(e["hf_min"], e["hf_max"], e["hf_avg"])
             km_part = f"{fmt_km(km)} km &middot; " if km else ""
             seg_lines.append(f"{tag}: {km_part}{e['zeit']} &middot; {hf}".strip(" &middot;"))
         summary_activity = act
@@ -246,10 +286,7 @@ def build_result_block(day_entries):
                     hf_avgs.append(float(e["hf_avg"]))
             total_km += km
             total_seconds += secs
-            hf = ""
-            if hf_mins:
-                avg = round(sum(hf_avgs) / len(hf_avgs)) if hf_avgs else ""
-                hf = f"HF {int(min(hf_mins))}-{int(max(hf_maxs))} (&#216; {avg})"
+            hf = fmt_hf_range(hf_mins, hf_maxs, hf_avgs)
             km_part = f"{fmt_km(km)} km &middot; {group[0]['zeit']} &middot; " if km else ""
             activity_lines.append(f"{act}: {km_part}{hf}".strip(" &middot;"))
         summary_activity = " + ".join(order)
@@ -524,7 +561,8 @@ def apply_all(html, results, stats, week, hours_baseline):
     html = replace_stat_value(html, "Ausgelooss", str(stats["ausgelooss"]), f"Grond: {stats['grond'] or '-'}")
     html = replace_stat_value(html, "Distanz Woch", f"{stats['distanz_total']:.1f}".replace(".", ",") + " km")
     if stats["hf_avg"] is not None:
-        html = replace_stat_value(html, "&#216; Häerzfrequenz", str(stats["hf_avg"]), f"{stats['hf_min']}-{stats['hf_max']} bpm")
+        hf_note = fmt_hf_note(stats["hf_min"], stats["hf_max"])
+        html = replace_stat_value(html, "&#216; Häerzfrequenz", str(stats["hf_avg"]), hf_note)
     if stats["gefill_avg"] is not None:
         html = replace_stat_value(html, "&#216; Gefill", f"{stats['gefill_avg']}/5")
 
