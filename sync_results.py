@@ -308,9 +308,7 @@ def find_day_block(scope_html, scope_offset, weekday):
     idx = scope_html.find(name_marker)
     if idx == -1:
         return None
-    div_start = scope_html.rfind('<div class="day "', 0, idx)
-    if div_start == -1:
-        div_start = scope_html.rfind('<div class="day ', 0, idx)
+    div_start = scope_html.rfind('<div class="day ', 0, idx)
     if div_start == -1:
         return None
     end_rel = find_balanced(scope_html, div_start, "div")
