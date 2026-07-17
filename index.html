@@ -70,6 +70,10 @@
   iframe.jotform { width: 100%; border: none; min-height: 540px; border-radius: 12px; }
   footer { text-align: center; font-size: 12px; color: #a3a29c; margin-top: 32px; }
   .week-comment { padding: 0 16px; font-size: 13px; color: #4a4944; margin: 4px 0 12px; font-style: italic; }
+  .stats-mini { display: flex; gap: 8px; padding: 0 16px; margin: 4px 0 12px; }
+  .stat-mini { background: #efeee8; border-radius: 8px; padding: 8px 12px; flex: 1; }
+  .stat-mini .label { font-size: 11px; color: #6b6a64; margin: 0 0 2px; }
+  .stat-mini .value { font-size: 16px; font-weight: 600; margin: 0; }
 </style>
 </head>
 <body>
@@ -172,6 +176,10 @@ Fräi oder Schwammen</div><details class="result result-done"><summary class="re
   <h2>Archiv</h2>
   <details class="week" open>
     <summary>Woch 2 &middot; 13. - 19. Juli 2026 <span class="arrow">&#9656;</span></summary>
+    <div class="stats-mini">
+      <div class="stat-mini"><p class="label">Distanz</p><p class="value">54,5 km</p></div>
+      <div class="stat-mini"><p class="label">Stonnen</p><p class="value">5,7 h</p></div>
+    </div>
     <div class="days">
       <div class="day laaf"><div class="day-head"><span class="day-name">Méindeg</span></div><span class="type type-laaf">Laafen</span><div class="desc">50 min easy jogg + 5x100m strides
 Kraft (Homegym, sh. Kraft-Programm)</div><details class="result result-done"><summary class="result-summary">&#10003; 8,70 km &middot; Kraft + Laafen<span class="chev">&#9656;</span></summary><span class="result-note">58:34 Gesamt &middot; 9m Héicht<br>Kraft: HF bis 135 (&#216; 105)<br>Laafen: 8,70 km &middot; 58:34 &middot; HF bis 163 (&#216; 141)<br>Gefill 4/5<br>Beim éischten Tour nach d'Adduktoren méi gespuert. Verschieden Übungen nach schwéier. Pistol squads. &middot; Been bessen schwéier . Bäi den Strides Adduktoren schons gespuert. Soss gutt.</span></details></div>
@@ -191,6 +199,10 @@ Fräi oder Schwammen</div><details class="result result-done"><summary class="re
   </details>
   <details class="week">
     <summary>Woch 1 &middot; 6. - 12. Juli 2026 <span class="arrow">&#9656;</span></summary>
+    <div class="stats-mini">
+      <div class="stat-mini"><p class="label">Distanz</p><p class="value">84,4 km</p></div>
+      <div class="stat-mini"><p class="label">Stonnen</p><p class="value">5,2 h</p></div>
+    </div>
     <p class="week-comment">Dës Woch: 4 vun 7 Sessiounen gemaach, 3 ausgelooss wéinst Krankheet fir d'Woch unzefänken. Gesamt 84,4 km (2x Rad, 2x Laafen), &#216; Häerzfrequenz 131 bpm, &#216; Gefill 3/5. No der Krankheet koum d'Konditioun zréck, mä d'Freideg-Sessioun huet sech nach ze séier ugefillt.</p>
     <div class="days">
       <div class="day laaf"><div class="day-head"><span class="day-name">Méindeg</span></div><span class="type type-laaf">Laafen</span><div class="desc">50 min easy jogg + 5x100m strides</div><div class="result result-off">Ausgelooss - Krank<span class="result-note">Kappwéi an Halsweh</span></div></div>
@@ -256,6 +268,22 @@ Fräi oder Schwammen</div><details class="result result-done"><summary class="re
     </div>
   </div>
   <p class="empty">Gëtt all Woch mat den neie Resultater aktualiséiert.</p>
+
+  <h2>Gesamt Iwwersiicht</h2>
+  <div class="stats">
+    <div class="stat">
+      <p class="label">Wochen</p>
+      <p class="value">2</p>
+    </div>
+    <div class="stat">
+      <p class="label">Gesamt Distanz</p>
+      <p class="value">138,9 km</p>
+    </div>
+    <div class="stat">
+      <p class="label">Gesamt Stonnen</p>
+      <p class="value">10,9 h</p>
+    </div>
+  </div>
 
   <footer>Training Guy &middot; gëtt all Woch aktualiséiert &middot; automatesch iwwer GitHub</footer>
 </div>
