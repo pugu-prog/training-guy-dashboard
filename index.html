@@ -238,7 +238,10 @@ Fräi oder Schwammen</div><details class="result result-done"><summary class="re
 
   <h2>Resultater aginn</h2>
   <div class="card" style="padding:0; overflow:hidden;">
-    <iframe class="jotform" src="https://form.jotform.com/261891471293060" title="Training Resultater Formulaire"></iframe>
+    <div style="display:flex; justify-content:flex-end; padding:8px 8px 0;">
+      <button type="button" onclick="reloadJotform()" style="border:1px solid #d9d7cd; background:#ffffff; color:#1a1a18; font-size:12.5px; font-weight:600; padding:6px 12px; border-radius:8px; cursor:pointer;">&#8635; Formulaire nei lueden</button>
+    </div>
+    <iframe class="jotform" id="jotformFrame" src="https://form.jotform.com/261891471293060" title="Training Resultater Formulaire"></iframe>
   </div>
 
   <h2>Auswertung</h2>
@@ -321,6 +324,11 @@ Fräi oder Schwammen</div><details class="result result-done"><summary class="re
       if (details.open) { renderChart(); }
     });
   })();
+  function reloadJotform() {
+    var f = document.getElementById('jotformFrame');
+    var base = 'https://form.jotform.com/261891471293060';
+    f.src = base + '?t=' + Date.now();
+  }
 </script>
 </body>
 </html>
