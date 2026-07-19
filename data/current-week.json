@@ -10,5 +10,6 @@
     { "weekday": "Samschdeg", "date": "20260718" },
     { "weekday": "Sonndeg", "date": "20260719" }
   ],
-  "hours_baseline": 5.2
+  "hours_baseline": 5.2039,
+  "km_baseline": 84.44
 }
