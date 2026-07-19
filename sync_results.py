@@ -4,8 +4,10 @@ Training Guy - results sync (GitHub Action version).
 
 Pulls new Jotform submissions for the current week and folds them into
 index.html and trainer.html (top day-grid + matching Archiv entry),
-recomputes the Auswertung stats block and the WEEK_HISTORY chart data,
-and writes the files back in place if anything changed.
+recomputes the Auswertung stats block, the per-week mini-stats under the
+open Archiv week, the "Gesamt Iwwersiicht" (all-time totals) section, and
+the WEEK_HISTORY chart data, and writes the files back in place if
+anything changed.
 
 This intentionally mirrors the formatting rules used by the
 "training-guy-results-sync" Claude skill, so the output looks identical
@@ -16,7 +18,7 @@ Env vars:
   JOTFORM_FORM_ID   - defaults to 261891471293060
 
 Files (relative to repo root):
-  data/current-week.json   - weekday->date map + week number + hours baseline
+  data/current-week.json   - weekday->date map + week number + hours/km baseline
   index.html, trainer.html - the two pages to update
 """
 import json
@@ -127,6 +129,11 @@ def fmt_km(f):
     if s.endswith(".00"):
         s = f"{f:.0f}"
     return s.replace(".", ",")
+
+
+def fmt_1dp(f):
+    """1-decimal, comma-separator formatting used for week/overall totals."""
+    return f"{f:.1f}".replace(".", ",")
 
 
 def parse_time_to_seconds(t):
@@ -401,7 +408,8 @@ def apply_day_result(html, weekday, new_result_html):
 def replace_stat_value(html, label, new_value, new_note=None):
     """Finds <p class="label">{label}</p> and replaces the following
     <p class="value">...</p> (and optionally the <p class="note">...</p>
-    right after it, if new_note is given)."""
+    right after it, if new_note is given). Matches the FIRST occurrence of
+    `label` in the document."""
     marker = f'<p class="label">{label}</p>'
     idx = html.find(marker)
     if idx == -1:
@@ -421,6 +429,75 @@ def replace_stat_value(html, label, new_value, new_note=None):
             new_note_html = re.sub(r'(<p class="note">).*?(</p>)', lambda mm: mm.group(1) + new_note + mm.group(2), m2.group(0), flags=re.S)
             html = html[:after2] + new_note_html + html[note_end:]
     return html
+
+
+def replace_label_value_in_segment(segment, label, new_value):
+    """Like replace_stat_value but operates on an already-scoped substring
+    and returns the (possibly unchanged) segment instead of raising if the
+    label isn't found - used for the newer mini-stats / Gesamt Iwwersiicht
+    blocks so a layout change there can't break the whole sync run."""
+    marker = f'<p class="label">{label}</p>'
+    idx = segment.find(marker)
+    if idx == -1:
+        return segment
+    after = idx + len(marker)
+    m = re.match(r'\s*<p class="value">.*?</p>', segment[after:], flags=re.S)
+    if not m:
+        return segment
+    value_end = after + m.end()
+    new_value_html = re.sub(r'(<p class="value">).*?(</p>)', lambda mm: mm.group(1) + new_value + mm.group(2), m.group(0), flags=re.S)
+    return segment[:after] + new_value_html + segment[value_end:]
+
+
+def update_open_week_mini_stats(html, distanz_value, stonnen_value):
+    """Keeps the small "Distanz"/"Stonnen" stat-mini block under the
+    currently-open Archiv week's title in sync with the live totals for
+    that week. Added 2026-07 alongside the Gesamt Iwwersiicht section;
+    older archived weeks are left untouched (their totals are frozen once
+    the week is closed by the weekly skill)."""
+    try:
+        scope_start, scope_end = get_open_archive_scope(html)
+    except ValueError:
+        return html
+    segment = html[scope_start:scope_end]
+    idx = segment.find('<div class="stats-mini">')
+    if idx == -1:
+        return html  # older page without mini-stats yet, skip gracefully
+    window_end = segment.find('<div class="days">', idx)
+    if window_end == -1:
+        window_end = min(len(segment), idx + 400)
+    window = segment[idx:window_end]
+    window = replace_label_value_in_segment(window, "Distanz", distanz_value)
+    window = replace_label_value_in_segment(window, "Stonnen", stonnen_value)
+    new_segment = segment[:idx] + window + segment[window_end:]
+    return html[:scope_start] + new_segment + html[scope_end:]
+
+
+def get_gesamt_section_scope(html):
+    marker = "<h2>Gesamt Iwwersiicht</h2>"
+    idx = html.find(marker)
+    if idx == -1:
+        return None
+    end = html.find("<footer>", idx)
+    if end == -1:
+        return None
+    return idx, end
+
+
+def update_gesamt_iwwersiicht(html, wochen, gesamt_km_value, gesamt_stonnen_value):
+    """Keeps the bottom "Gesamt Iwwersiicht" (Wochen / Gesamt Distanz /
+    Gesamt Stonnen) section in sync with the running totals across all
+    weeks. Skips quietly if the section doesn't exist on a page (e.g. an
+    older cached copy) instead of failing the whole sync run."""
+    scope = get_gesamt_section_scope(html)
+    if not scope:
+        return html
+    scope_start, scope_end = scope
+    segment = html[scope_start:scope_end]
+    segment = replace_label_value_in_segment(segment, "Wochen", str(wochen))
+    segment = replace_label_value_in_segment(segment, "Gesamt Distanz", gesamt_km_value)
+    segment = replace_label_value_in_segment(segment, "Gesamt Stonnen", gesamt_stonnen_value)
+    return html[:scope_start] + segment + html[scope_end:]
 
 
 def replace_week_history_last(html, laafen, velo, total):
@@ -553,13 +630,13 @@ def build_day_blocks(by_date, week):
     return results, stats
 
 
-def apply_all(html, results, stats, week, hours_baseline):
+def apply_all(html, results, stats, week, hours_baseline, km_baseline):
     for weekday, result_html in results.items():
         html = apply_day_result(html, weekday, result_html)
 
     html = replace_stat_value(html, "Gemaach", f"{stats['gemaach']}/{stats['days_passed']}", f"vun de leschte {stats['days_passed']} Deeg")
     html = replace_stat_value(html, "Ausgelooss", str(stats["ausgelooss"]), f"Grond: {stats['grond'] or '-'}")
-    html = replace_stat_value(html, "Distanz Woch", f"{stats['distanz_total']:.1f}".replace(".", ",") + " km")
+    html = replace_stat_value(html, "Distanz Woch", fmt_1dp(stats["distanz_total"]) + " km")
     if stats["hf_avg"] is not None:
         hf_note = fmt_hf_note(stats["hf_min"], stats["hf_max"])
         html = replace_stat_value(html, "&#216; Häerzfrequenz", str(stats["hf_avg"]), hf_note)
@@ -569,7 +646,27 @@ def apply_all(html, results, stats, week, hours_baseline):
     html = replace_week_history_last(html, stats["laafen_km"], stats["velo_km"], stats["distanz_total"])
 
     total_hours = hours_baseline + stats["week_hours"]
-    html = replace_stat_value(html, "Gesamt Stonnen", f"{total_hours:.1f}".replace(".", ",") + " h")
+    html = replace_stat_value(html, "Gesamt Stonnen", fmt_1dp(total_hours) + " h")
+
+    # Per-week mini-stats under the open Archiv week's title, and the
+    # all-time "Gesamt Iwwersiicht" section at the bottom of the page.
+    # Both are recomputed from scratch every run so they can never drift
+    # from the Auswertung stats above, regardless of how many automated
+    # syncs have run since the week started.
+    html = update_open_week_mini_stats(
+        html,
+        fmt_1dp(stats["distanz_total"]) + " km",
+        fmt_1dp(stats["week_hours"]) + " h",
+    )
+
+    gesamt_km = km_baseline + stats["distanz_total"]
+    html = update_gesamt_iwwersiicht(
+        html,
+        week["week_number"],
+        fmt_1dp(gesamt_km) + " km",
+        fmt_1dp(total_hours) + " h",
+    )
+
     return html
 
 
@@ -592,7 +689,10 @@ def main():
         path = os.path.join(REPO_ROOT, filename)
         with open(path, encoding="utf-8") as f:
             original = f.read()
-        updated = apply_all(original, results, stats, week, week["hours_baseline"])
+        updated = apply_all(
+            original, results, stats, week,
+            week["hours_baseline"], week.get("km_baseline", 0.0),
+        )
         if normalize(updated) != normalize(original):
             with open(path, "w", encoding="utf-8") as f:
                 f.write(updated)
