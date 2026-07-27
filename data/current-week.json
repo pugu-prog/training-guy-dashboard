@@ -1,15 +1,15 @@
 {
-  "week_number": 3,
-  "week_label": "Woch 3",
+  "week_number": 4,
+  "week_label": "Woch 4",
   "days": [
-    { "weekday": "Méindeg", "date": "20260720" },
-    { "weekday": "Dënschdeg", "date": "20260721" },
-    { "weekday": "Mëttwoch", "date": "20260722" },
-    { "weekday": "Donneschdeg", "date": "20260723" },
-    { "weekday": "Freideg", "date": "20260724" },
-    { "weekday": "Samschdeg", "date": "20260725" },
-    { "weekday": "Sonndeg", "date": "20260726" }
+    { "weekday": "Méindeg", "date": "20260727" },
+    { "weekday": "Dënschdeg", "date": "20260728" },
+    { "weekday": "Mëttwoch", "date": "20260729" },
+    { "weekday": "Donneschdeg", "date": "20260730" },
+    { "weekday": "Freideg", "date": "20260731" },
+    { "weekday": "Samschdeg", "date": "20260801" },
+    { "weekday": "Sonndeg", "date": "20260802" }
   ],
-  "hours_baseline": 15.13583,
-  "km_baseline": 209.07
+  "hours_baseline": 24.841386,
+  "km_baseline": 333.98
 }
