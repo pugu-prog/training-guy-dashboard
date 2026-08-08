@@ -348,11 +348,11 @@ Fräi oder Schwammen</div><details class="result result-done"><summary class="re
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script>
   var WEEK_HISTORY = [
-    { label: "Woch 1", laafen: 24.5, velo: 59.9, total: 84.4 },
-    { label: "Woch 2", laafen: 41.58, velo: 83.05, total: 124.63 },
-    { label: "Woch 3", laafen: 46.6, velo: 78.31, total: 124.91 },
-    { label: "Woch 4", laafen: 56.09, velo: 37.26, total: 93.35 },
-    { label: "Woch 5", laafen: 15.65, velo: 63.41, total: 79.06 }
+    { label: "Woch 1", laafen: 24.5, velo: 59.9, schwammen: 0, total: 84.4 },
+    { label: "Woch 2", laafen: 41.58, velo: 83.05, schwammen: 0, total: 124.63 },
+    { label: "Woch 3", laafen: 46.6, velo: 78.31, schwammen: 0, total: 124.91 },
+    { label: "Woch 4", laafen: 56.09, velo: 37.26, schwammen: 0, total: 93.35 },
+    { label: "Woch 5", laafen: 15.65, velo: 63.41, schwammen: 0, total: 79.06 }
   ];
   (function () {
     var details = document.getElementById('statsDetails');
@@ -368,6 +368,7 @@ Fräi oder Schwammen</div><details class="result result-done"><summary class="re
           datasets: [
             { label: 'Laafen', data: WEEK_HISTORY.map(function (w) { return w.laafen; }), borderColor: '#1d9e75', backgroundColor: '#1d9e75', tension: 0.2 },
             { label: 'Vëlo', data: WEEK_HISTORY.map(function (w) { return w.velo; }), borderColor: '#ef9f27', backgroundColor: '#ef9f27', tension: 0.2 },
+            { label: 'Schwammen', data: WEEK_HISTORY.map(function (w) { return w.schwammen; }), borderColor: '#1698c9', backgroundColor: '#1698c9', tension: 0.2 },
             { label: 'Zesummen', data: WEEK_HISTORY.map(function (w) { return w.total; }), borderColor: '#378add', backgroundColor: '#378add', tension: 0.2, borderDash: [4, 4] }
           ]
         },
