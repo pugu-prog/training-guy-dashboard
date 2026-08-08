@@ -211,7 +211,7 @@ def fmt_hf_note(hf_min, hf_max):
 
 def build_result_block(day_entries):
     """day_entries: list of parsed submissions for one date, all Status=Gemaach."""
-    # Group by Aktivitéit (e.g. "Laafen", "Kraft", "Rad")
+    # Group by Aktivitéit (e.g. "Laafen", "Kraft", "Rad", "Schwammen")
     by_activity = {}
     order = []
     for e in day_entries:
@@ -509,7 +509,7 @@ def update_gesamt_iwwersiicht(html, wochen, gesamt_km_value, gesamt_stonnen_valu
     return html[:scope_start] + segment + html[scope_end:]
 
 
-def replace_week_history_last(html, laafen, velo, total):
+def replace_week_history_last(html, laafen, velo, schwammen, total):
     m = re.search(r"var WEEK_HISTORY = (\[.*?\]);", html, flags=re.S)
     if not m:
         raise ValueError("WEEK_HISTORY not found")
@@ -520,6 +520,12 @@ def replace_week_history_last(html, laafen, velo, total):
     last = entries[-1]
     new_last = re.sub(r'laafen:\s*[\d.]+', f"laafen: {laafen:g}", last)
     new_last = re.sub(r'velo:\s*[\d.]+', f"velo: {velo:g}", new_last)
+    if "schwammen:" in new_last:
+        new_last = re.sub(r'schwammen:\s*[\d.]+', f"schwammen: {schwammen:g}", new_last)
+    else:
+        # Older entry written before "schwammen" existed - add it right
+        # after "velo" so newly-synced weeks still carry the field.
+        new_last = re.sub(r'(velo:\s*[\d.]+,?)', lambda mm: f"{mm.group(1)} schwammen: {schwammen:g},", new_last, count=1)
     new_last = re.sub(r'total:\s*[\d.]+', f"total: {total:g}", new_last)
     new_arr_text = arr_text[: arr_text.rfind(last)] + new_last + arr_text[arr_text.rfind(last) + len(last):]
     return html[: m.start(1)] + new_arr_text + html[m.end(1):]
@@ -559,6 +565,7 @@ def build_day_blocks(by_date, week):
     results = {}
     laafen_km = 0.0
     velo_km = 0.0
+    schwammen_km = 0.0
     gemaach_days = 0
     ausgelooss_days = 0
     grond_counts = {}
@@ -586,6 +593,11 @@ def build_day_blocks(by_date, week):
                 if e["aktiviteit"] == "Rad" and e["distanz"]:
                     try:
                         velo_km += float(str(e["distanz"]).replace(",", "."))
+                    except ValueError:
+                        pass
+                if e["aktiviteit"] == "Schwammen" and e["distanz"]:
+                    try:
+                        schwammen_km += float(str(e["distanz"]).replace(",", "."))
                     except ValueError:
                         pass
                 secs = parse_time_to_seconds(e["zeit"])
@@ -627,9 +639,10 @@ def build_day_blocks(by_date, week):
         "days_passed": days_passed,
         "ausgelooss": ausgelooss_days,
         "grond": most_common_grond,
-        "distanz_total": laafen_km + velo_km,
+        "distanz_total": laafen_km + velo_km + schwammen_km,
         "laafen_km": laafen_km,
         "velo_km": velo_km,
+        "schwammen_km": schwammen_km,
         "hf_avg": hf_avg,
         "hf_min": int(min(hf_mins)) if hf_mins else None,
         "hf_max": int(max(hf_maxs)) if hf_maxs else None,
@@ -652,7 +665,7 @@ def apply_all(html, results, stats, week, hours_baseline, km_baseline):
     if stats["gefill_avg"] is not None:
         html = replace_stat_value(html, "&#216; Gefill", f"{stats['gefill_avg']}/5")
 
-    html = replace_week_history_last(html, stats["laafen_km"], stats["velo_km"], stats["distanz_total"])
+    html = replace_week_history_last(html, stats["laafen_km"], stats["velo_km"], stats["schwammen_km"], stats["distanz_total"])
 
     total_hours = hours_baseline + stats["week_hours"]
     html = replace_stat_value(html, "Gesamt Stonnen", fmt_1dp(total_hours) + " h")
