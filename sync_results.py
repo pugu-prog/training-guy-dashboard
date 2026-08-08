@@ -137,10 +137,19 @@ def fmt_1dp(f):
 
 
 def parse_time_to_seconds(t):
+    """Parses a "M:SS" or "H:MM:SS" Zäit value into seconds. Defensive:
+    a malformed value (e.g. "5,01" typed with a comma instead of a colon,
+    the same class of mistake we've already seen in the Distanz field)
+    must NEVER crash the whole sync run - it's logged and treated as 0s
+    instead, so one bad submission can't take down the dashboard for the
+    rest of the week."""
     if not t:
         return 0
-    parts = t.strip().split(":")
-    parts = [int(p) for p in parts]
+    try:
+        parts = [int(p) for p in t.strip().split(":")]
+    except (ValueError, TypeError):
+        print(f"WARNING: couldn't parse Zäit value {t!r} (expected M:SS or H:MM:SS), treating as 0s", file=sys.stderr)
+        return 0
     if len(parts) == 2:
         return parts[0] * 60 + parts[1]
     if len(parts) == 3:
