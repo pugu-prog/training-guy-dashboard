@@ -509,7 +509,7 @@ def update_gesamt_iwwersiicht(html, wochen, gesamt_km_value, gesamt_stonnen_valu
     return html[:scope_start] + segment + html[scope_end:]
 
 
-def replace_week_history_last(html, laafen, velo, schwammen, total):
+def replace_week_history_last(html, laafen, velo, schwammen, stonnen, total):
     m = re.search(r"var WEEK_HISTORY = (\[.*?\]);", html, flags=re.S)
     if not m:
         raise ValueError("WEEK_HISTORY not found")
@@ -526,6 +526,16 @@ def replace_week_history_last(html, laafen, velo, schwammen, total):
         # Older entry written before "schwammen" existed - add it right
         # after "velo" so newly-synced weeks still carry the field.
         new_last = re.sub(r'(velo:\s*[\d.]+,?)', lambda mm: f"{mm.group(1)} schwammen: {schwammen:g},", new_last, count=1)
+    if "stonnen:" in new_last:
+        new_last = re.sub(r'stonnen:\s*[\d.]+', f"stonnen: {stonnen:g}", new_last)
+    else:
+        # Same deal as schwammen above: older entries predating the
+        # "stonnen" field need it added, not silently skipped. This was
+        # the field that was previously never written at all (root cause
+        # of the "current week always shows 0h on the chart" bug), so
+        # this branch matters even though every current entry already
+        # has the key.
+        new_last = re.sub(r'(schwammen:\s*[\d.]+,?)', lambda mm: f"{mm.group(1)} stonnen: {stonnen:g},", new_last, count=1)
     new_last = re.sub(r'total:\s*[\d.]+', f"total: {total:g}", new_last)
     new_arr_text = arr_text[: arr_text.rfind(last)] + new_last + arr_text[arr_text.rfind(last) + len(last):]
     return html[: m.start(1)] + new_arr_text + html[m.end(1):]
@@ -665,7 +675,7 @@ def apply_all(html, results, stats, week, hours_baseline, km_baseline):
     if stats["gefill_avg"] is not None:
         html = replace_stat_value(html, "&#216; Gefill", f"{stats['gefill_avg']}/5")
 
-    html = replace_week_history_last(html, stats["laafen_km"], stats["velo_km"], stats["schwammen_km"], stats["distanz_total"])
+    html = replace_week_history_last(html, stats["laafen_km"], stats["velo_km"], stats["schwammen_km"], stats["week_hours"], stats["distanz_total"])
 
     total_hours = hours_baseline + stats["week_hours"]
     html = replace_stat_value(html, "Gesamt Stonnen", fmt_1dp(total_hours) + " h")
