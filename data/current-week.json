@@ -1,15 +1,1 @@
-{
-  "week_number": 7,
-  "week_label": "Woch 7",
-  "days": [
-    { "weekday": "Méindeg", "date": "20260817" },
-    { "weekday": "Dënschdeg", "date": "20260818" },
-    { "weekday": "Mëttwoch", "date": "20260819" },
-    { "weekday": "Donneschdeg", "date": "20260820" },
-    { "weekday": "Freideg", "date": "20260821" },
-    { "weekday": "Samschdeg", "date": "20260822" },
-    { "weekday": "Sonndeg", "date": "20260823" }
-  ],
-  "hours_baseline": 51.094163,
-  "km_baseline": 654.02
-}
+__FILE__current-week.json__
