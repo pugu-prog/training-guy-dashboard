@@ -1,1 +1,15 @@
-__FILE__current-week.json__
+{
+  "week_number": 8,
+  "week_label": "Woch 8",
+  "days": [
+    { "weekday": "Méindeg", "date": "20260824" },
+    { "weekday": "Dënschdeg", "date": "20260825" },
+    { "weekday": "Mëttwoch", "date": "20260826" },
+    { "weekday": "Donneschdeg", "date": "20260827" },
+    { "weekday": "Freideg", "date": "20260828" },
+    { "weekday": "Samschdeg", "date": "20260829" },
+    { "weekday": "Sonndeg", "date": "20260830" }
+  ],
+  "hours_baseline": 61.546363,
+  "km_baseline": 768.936
+}
