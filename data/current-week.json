@@ -11,5 +11,11 @@
     { "weekday": "Sonndeg", "date": "20260830" }
   ],
   "hours_baseline": 61.546363,
-  "km_baseline": 768.936
+  "km_baseline": 768.936,
+  "activity_baselines": {
+    "velo": { "km": 477.35, "hours": 23.770556 },
+    "laafen": { "km": 289.03, "hours": 29.641389 },
+    "kraft": { "km": 0.0, "hours": 6.804167 },
+    "schwammen": { "km": 2.556, "hours": 1.330833 }
+  }
 }
