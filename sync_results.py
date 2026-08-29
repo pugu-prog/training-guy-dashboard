@@ -509,6 +509,65 @@ def update_gesamt_iwwersiicht(html, wochen, gesamt_km_value, gesamt_stonnen_valu
     return html[:scope_start] + segment + html[scope_end:]
 
 
+def replace_label_value_note_in_segment(segment, label, new_value, new_note=None):
+    """Like replace_label_value_in_segment, but can also set the <p
+    class="note"> right after the value (used for the per-activity
+    breakdown stats, which show km as the value and Zäit as the note -
+    or just Zäit as the value for Kraft, which has no km)."""
+    marker = f'<p class="label">{label}</p>'
+    idx = segment.find(marker)
+    if idx == -1:
+        return segment
+    after = idx + len(marker)
+    m = re.match(r'\s*<p class="value">.*?</p>', segment[after:], flags=re.S)
+    if not m:
+        return segment
+    value_end = after + m.end()
+    new_value_html = re.sub(r'(<p class="value">).*?(</p>)', lambda mm: mm.group(1) + new_value + mm.group(2), m.group(0), flags=re.S)
+    segment = segment[:after] + new_value_html + segment[value_end:]
+    if new_note is not None:
+        after2 = after + len(new_value_html)
+        m2 = re.match(r'\s*<p class="note">.*?</p>', segment[after2:], flags=re.S)
+        if m2:
+            note_end = after2 + m2.end()
+            new_note_html = re.sub(r'(<p class="note">).*?(</p>)', lambda mm: mm.group(1) + new_note + mm.group(2), m2.group(0), flags=re.S)
+            segment = segment[:after2] + new_note_html + segment[note_end:]
+    return segment
+
+
+ACTIVITY_STAT_LABELS = [
+    ("velo", "Vëlo"),
+    ("laafen", "Laafen"),
+    ("kraft", "Kraft"),
+    ("schwammen", "Schwammen"),
+]
+
+
+def update_gesamt_activity_breakdown(html, activity_totals):
+    """Keeps the per-activity (Vëlo/Laafen/Kraft/Schwammen) km+Zäit
+    breakdown stat blocks inside "Gesamt Iwwersiicht" in sync with the
+    all-time totals (baseline-through-last-week + this-week-so-far).
+    Kraft has no distance in Jotform, so its stat shows hours as the main
+    value instead of "0,0 km". Skips quietly if a page doesn't have these
+    blocks yet (e.g. an older cached copy), same graceful-degradation
+    policy as the rest of the Gesamt Iwwersiicht helpers."""
+    scope = get_gesamt_section_scope(html)
+    if not scope:
+        return html
+    scope_start, scope_end = scope
+    segment = html[scope_start:scope_end]
+    for key, label in ACTIVITY_STAT_LABELS:
+        totals = activity_totals.get(key, {"km": 0.0, "hours": 0.0})
+        if key == "kraft":
+            value = fmt_1dp(totals["hours"]) + " h"
+            note = None
+        else:
+            value = fmt_1dp(totals["km"]) + " km"
+            note = fmt_1dp(totals["hours"]) + " h"
+        segment = replace_label_value_note_in_segment(segment, label, value, note)
+    return html[:scope_start] + segment + html[scope_end:]
+
+
 def replace_week_history_last(html, laafen, velo, schwammen, stonnen, total):
     m = re.search(r"var WEEK_HISTORY = (\[.*?\]);", html, flags=re.S)
     if not m:
@@ -569,6 +628,9 @@ def hours_for_entries(entries):
     return total / 3600.0
 
 
+ACTIVITY_KEY = {"Laafen": "laafen", "Rad": "velo", "Kraft": "kraft", "Schwammen": "schwammen"}
+
+
 def build_day_blocks(by_date, week):
     """Returns dict weekday -> (result_html_or_None, entries) plus rollup stats."""
     date_to_weekday = {d["date"]: d["weekday"] for d in week["days"]}
@@ -576,6 +638,8 @@ def build_day_blocks(by_date, week):
     laafen_km = 0.0
     velo_km = 0.0
     schwammen_km = 0.0
+    activity_km = {"velo": 0.0, "laafen": 0.0, "kraft": 0.0, "schwammen": 0.0}
+    activity_secs = {"velo": 0.0, "laafen": 0.0, "kraft": 0.0, "schwammen": 0.0}
     gemaach_days = 0
     ausgelooss_days = 0
     grond_counts = {}
@@ -612,6 +676,14 @@ def build_day_blocks(by_date, week):
                         pass
                 secs = parse_time_to_seconds(e["zeit"])
                 week_seconds += secs
+                act_key = ACTIVITY_KEY.get(e["aktiviteit"])
+                if act_key:
+                    activity_secs[act_key] += secs
+                    if e["distanz"]:
+                        try:
+                            activity_km[act_key] += float(str(e["distanz"]).replace(",", "."))
+                        except ValueError:
+                            pass
                 if e["hf_avg"] and secs:
                     try:
                         hf_avgs_weighted.append((float(e["hf_avg"]), secs))
@@ -653,6 +725,8 @@ def build_day_blocks(by_date, week):
         "laafen_km": laafen_km,
         "velo_km": velo_km,
         "schwammen_km": schwammen_km,
+        "activity_km": activity_km,
+        "activity_hours": {k: v / 3600.0 for k, v in activity_secs.items()},
         "hf_avg": hf_avg,
         "hf_min": int(min(hf_mins)) if hf_mins else None,
         "hf_max": int(max(hf_maxs)) if hf_maxs else None,
@@ -662,7 +736,7 @@ def build_day_blocks(by_date, week):
     return results, stats
 
 
-def apply_all(html, results, stats, week, hours_baseline, km_baseline):
+def apply_all(html, results, stats, week, hours_baseline, km_baseline, activity_baselines=None):
     for weekday, result_html in results.items():
         html = apply_day_result(html, weekday, result_html)
 
@@ -699,6 +773,16 @@ def apply_all(html, results, stats, week, hours_baseline, km_baseline):
         fmt_1dp(total_hours) + " h",
     )
 
+    activity_baselines = activity_baselines or {}
+    activity_totals = {}
+    for key in ("velo", "laafen", "kraft", "schwammen"):
+        baseline = activity_baselines.get(key, {"km": 0.0, "hours": 0.0})
+        activity_totals[key] = {
+            "km": baseline.get("km", 0.0) + stats["activity_km"].get(key, 0.0),
+            "hours": baseline.get("hours", 0.0) + stats["activity_hours"].get(key, 0.0),
+        }
+    html = update_gesamt_activity_breakdown(html, activity_totals)
+
     return html
 
 
@@ -724,6 +808,7 @@ def main():
         updated = apply_all(
             original, results, stats, week,
             week["hours_baseline"], week.get("km_baseline", 0.0),
+            week.get("activity_baselines", {}),
         )
         if normalize(updated) != normalize(original):
             with open(path, "w", encoding="utf-8") as f:
