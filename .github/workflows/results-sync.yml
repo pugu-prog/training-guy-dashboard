@@ -9,6 +9,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
 
 jobs:
   sync:
@@ -36,7 +37,20 @@ jobs:
             git add index.html trainer.html
             git commit -m "Resultater-Sync (automatesch via GitHub Actions)"
             git push
-            rm -f .sync-changed
           else
             echo "Näischt geännert, kee Commit."
           fi
+
+      - name: Email-Notifikatioun per Issue, wann eppes geännert huet
+        if: ${{ hashFiles('.sync-changed') != '' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          URL=$(gh issue create \
+            --repo "${{ github.repository }}" \
+            --title "Dashboard aktualiséiert - $(date -u '+%d.%m.%Y %H:%M UTC')" \
+            --body "D'Training-Dashboard gouf just automatesch aktualiséiert: https://pugu-prog.github.io/training-guy-dashboard/")
+          gh issue close "$URL" --repo "${{ github.repository }}"
+
+      - name: Ophuelen
+        run: rm -f .sync-changed
