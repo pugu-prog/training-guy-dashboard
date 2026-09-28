@@ -166,7 +166,8 @@ def fmt_hms(total_seconds):
     return f"{m}:{s:02d}"
 
 
-PHASE_TAG = {"Warmup": "WU", "Training": "TR", "Cooldown": "CD"}
+PHASE_TAG = {"Warmup": "WU", "Training": "TR", "Race": "Race", "Cooldown": "CD"}
+PHASE_ORDER = ["Warmup", "Training", "Race", "Cooldown"]
 
 
 def fmt_hf(hf_min, hf_max, hf_avg):
@@ -236,7 +237,7 @@ def build_result_block(day_entries):
 
     if single_activity_segmented:
         act = order[0]
-        segs = sorted(by_activity[act], key=lambda e: ["Warmup", "Training", "Cooldown"].index(e["phase"]) if e.get("phase") in PHASE_TAG else 99)
+        segs = sorted(by_activity[act], key=lambda e: PHASE_ORDER.index(e["phase"]) if e.get("phase") in PHASE_TAG else 99)
         for e in segs:
             km = None
             if e["distanz"]:
