@@ -1,21 +1,54 @@
 {
-  "week_number": 13,
-  "week_label": "Woch 13",
+  "week_number": 14,
+  "week_label": "Woch 14",
   "days": [
-    { "weekday": "Méindeg", "date": "20260928" },
-    { "weekday": "Dënschdeg", "date": "20260929" },
-    { "weekday": "Mëttwoch", "date": "20260930" },
-    { "weekday": "Donneschdeg", "date": "20261001" },
-    { "weekday": "Freideg", "date": "20261002" },
-    { "weekday": "Samschdeg", "date": "20261003" },
-    { "weekday": "Sonndeg", "date": "20261004" }
+    {
+      "weekday": "Méindeg",
+      "date": "20261005"
+    },
+    {
+      "weekday": "Dënschdeg",
+      "date": "20261006"
+    },
+    {
+      "weekday": "Mëttwoch",
+      "date": "20261007"
+    },
+    {
+      "weekday": "Donneschdeg",
+      "date": "20261008"
+    },
+    {
+      "weekday": "Freideg",
+      "date": "20261009"
+    },
+    {
+      "weekday": "Samschdeg",
+      "date": "20261010"
+    },
+    {
+      "weekday": "Sonndeg",
+      "date": "20261011"
+    }
   ],
-  "hours_baseline": 106.684973,
-  "km_baseline": 1352.433,
+  "hours_baseline": 113.522473,
+  "km_baseline": 1452.469,
   "activity_baselines": {
-    "velo": { "km": 793.15, "hours": 39.501112 },
-    "laafen": { "km": 549.70, "hours": 55.162778 },
-    "kraft": { "km": 0.0, "hours": 7.484723 },
-    "schwammen": { "km": 9.583, "hours": 4.535833 }
+    "velo": {
+      "km": 856.41,
+      "hours": 42.409723
+    },
+    "laafen": {
+      "km": 585.41,
+      "hours": 58.582778
+    },
+    "kraft": {
+      "km": 0.0,
+      "hours": 7.484723
+    },
+    "schwammen": {
+      "km": 10.649,
+      "hours": 5.044722
+    }
   }
 }
