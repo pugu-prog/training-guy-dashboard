@@ -92,3 +92,17 @@ Wann een een Dag am Plang ännert/tauscht: béid HTML-Dateien (aktuell + Archiv)
 ## Commit-Messagen
 
 Kuerz, op Lëtzebuergesch, z. B. `Woch 14: archive Woch 13, start new week` oder `Woch 13: Méindeg Schwammen amplaz Rescht`.
+
+## Geplangt: `.fit`-Import mat Detail-Usiicht (nach net gebaut)
+
+Zil: `.fit`-Dateien (Auer/Vëlo-Computer) importéieren, fir **exakt km pro Dag** an eng **Detail-Usiicht pro Sessioun**.
+
+- **Input:** De Guy leet `.fit`-Dateien an e Dossier (Virschlag `fit/`, iwwer GitHub-Web oder Handy eropgelueden). Eng GitHub Action (bestoend `results-sync.yml` erweideren oder en eegene Workflow) parst se, z. B. mat `fitdecode`/`fitparse`.
+- **Zouuerdnung:** Sport (Laafen/Rad/Schwammen/…) an Datum aus der Datei → Dag an der oppener Woch, iwwer `data/current-week.json`. Dës Sessioun zielt an d'km/Stonnen-Totalen an an d'Baselines, genee wéi eng Jotform-Submissioun. **Keng Duebelzielung:** Wann et fir déiselwecht Sessioun och e Jotform-Entrée gëtt, eng kloer Reegel festleeën (z. B. `.fit` gewënnt bei km/Zäit/HF, Jotform liwwert nëmmen Gefill + Bemierkung).
+- **Detail-Usiicht** (geet op, wann een um Resultat-Block vum Dag klickt):
+  - Kaart mat der Streck (Leaflet + OpenStreetMap; Libs nëmmen vu cdnjs/jsdelivr)
+  - Kurven: Häerzfrequenz an Tempo iwwer d'Zäit, beim Vëlo och Héichteprofil (Chart.js ass schonn agebonnen)
+  - Splits pro km (Zäit, Ø HF, Héichtemeter); beim Schwammen pro Längt/Intervall
+- **Privatsphär (wichteg, d'Säit ass ëffentlech):** Op der Kaart déi éischt an déi lescht ~300 m vun der Streck ewechloossen (sou datt de Start/Doheem net ze gesinn ass). Nëmmen eng reduzéiert, ofgeleet JSON pro Sessioun publizéieren (z. B. `data/sessions/YYYYMMDD-N.json`, Track ausgedënnt), **net déi rau `.fit`-Dateien**. Déi rau Dateien nom Veraarbechten aus dem Repo läschen oder ni committen (z. B. Upload an e privaten Drive/Release a just d'JSON publizéieren). Mam Guy ofklären, ier en Track live geet.
+- `index.html` an `trainer.html` béid upassen; Resultat-Block-Format a Faarwen wéi uewen beschriwwen behalen.
+- **Ufank:** Beim Guy no enger Beispill-`.fit` vum Laafen a vum Schwammen froen, an no sengem Apparat (Garmin/Polar/Wahoo/Apple …), ier eppes gebaut gëtt.
