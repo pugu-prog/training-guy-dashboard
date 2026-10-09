@@ -48,7 +48,8 @@ def fetch_submissions():
     except urllib.error.URLError as e:
         print(f"Jotform API request failed: {e}", file=sys.stderr)
         sys.exit(1)
-    return data.get("content", [])
+    # Jotform also returns submissions deleted in the inbox (status DELETED); skip them
+    return [s for s in data.get("content", []) if s.get("status") != "DELETED"]
 
 
 def answer_by_name(answers, name):
