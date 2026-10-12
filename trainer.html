@@ -235,7 +235,7 @@ Partyrun (easy)</div><details class="result result-done"><summary class="result-
       <div class="stat-mini"><p class="label">Distanz</p><p class="value">131,2 km</p></div>
       <div class="stat-mini"><p class="label">Stonnen</p><p class="value">8,7 h</p></div>
     </div>
-    <p class="week-comment">Dës Woch: 6 vun 6 Sessiounen gemaach, keng ausgelooss. Gesamt 131,2 km (55,57 km Laafen, 75,67 km Vëlo), &#216; Häerzfrequenz 137 bpm, &#216; Gefill 3/5. Béid Haaptsessiounen (Mëttwoch Intervaller, Freideg Tempo) si gutt gaang, och wann et de Freideg e bëssen midd Been an schwéier unzekommen war; de Samschdeg mam 2h Vëlo huet sech gutt ugefillt.</p>
+    <p class="week-comment">Dës Woch: 6 vun 6 Sessiounen gemaach, keng ausgelooss. Gesamt 131,2 km (55,57 km Laafen, 75,67 km Vëlo), &#216; Häerzfrequenz 137 bpm, &#216; Gefill 3/5. Béid Haaptsessiounen (Mëttwoch Intervaller, Freideg Tempo) si gutt gaang, och wann et de Freideg e bëssen midd Been an schwéier unzekommen war; de Samschdeg mam 2h Vëlo huet sech gutt ugefëlt.</p>
     <div class="days">
       <div class="day laaf"><div class="day-head"><span class="day-name">Méindeg</span></div><span class="type type-laaf">Laafen</span><div class="desc">60 min easy run + strides
 Schwammen</div><details class="result result-done"><summary class="result-summary">&#10003; 10,04 km &middot; Laafen<span class="chev">&#9656;</span></summary><span class="result-note">1:07:13 Gesamt &middot; 16m Héicht<br>TR: 1,04 km &middot; 6:57 &middot; HF bis 150 (&#216; 140)<br>TR: 9 km &middot; 1:00:16 &middot; HF bis 142 (&#216; 135)<br>Gefill 3/5<br>Gutt an midd &middot; Midd schwéier Been</span></details></div>
@@ -481,7 +481,7 @@ Fräi oder Schwammen</div><details class="result result-done"><summary class="re
       <div class="stat-mini"><p class="label">Distanz</p><p class="value">84,4 km</p></div>
       <div class="stat-mini"><p class="label">Stonnen</p><p class="value">5,2 h</p></div>
     </div>
-    <p class="week-comment">Dës Woch: 4 vun 7 Sessiounen gemaach, 3 ausgelooss wéinst Krankheet fir d'Woch unzefänken. Gesamt 84,4 km (2x Rad, 2x Laafen), &#216; Häerzfrequenz 131 bpm, &#216; Gefill 3/5. No der Krankheet koum d'Konditioun zréck, mä d'Freideg-Sessioun huet sech nach ze séier ugefëllt.</p>
+    <p class="week-comment">Dës Woch: 4 vun 7 Sessiounen gemaach, 3 ausgelooss wéinst Krankheet fir d'Woch unzefänken. Gesamt 84,4 km (2x Rad, 2x Laafen), &#216; Häerzfrequenz 131 bpm, &#216; Gefill 3/5. No der Krankheet koum d'Konditioun zréck, mä d'Freideg-Sessioun huet sech nach ze séier ugefillt.</p>
     <div class="days">
       <div class="day laaf"><div class="day-head"><span class="day-name">Méindeg</span></div><span class="type type-laaf">Laafen</span><div class="desc">50 min easy jogg + 5x100m strides</div><div class="result result-off">Ausgelooss - Krank<span class="result-note">Kappwéi an Halsweh</span></div></div>
       <div class="day kraft"><div class="day-head"><span class="day-name">Dënschdeg</span></div><span class="type type-kraft">Kraft</span><div class="desc">15 min warm up + Kraft</div><div class="result result-off">Ausgelooss - Krank</div></div>
@@ -620,7 +620,8 @@ Fräi oder Schwammen</div><details class="result result-done"><summary class="re
         options: {
           responsive: true,
           scales: {
-            y: { beginAtZero: true, title: { display: true, text: 'Schwammen (km) / Stonnen (h)' } }
+            y: { beginAtZero: true, title: { display: true, text: 'km' } },
+            y1: { beginAtZero: true, position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: 'Schwammen (km) / Stonnen (h)' } }
           }
         }
       });
