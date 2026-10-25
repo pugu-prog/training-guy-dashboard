@@ -1,54 +1,54 @@
 {
-  "week_number": 16,
-  "week_label": "Woch 16",
+  "week_number": 17,
+  "week_label": "Woch 17",
   "days": [
     {
       "weekday": "Méindeg",
-      "date": "20261019"
+      "date": "20261026"
     },
     {
       "weekday": "Dënschdeg",
-      "date": "20261020"
+      "date": "20261027"
     },
     {
       "weekday": "Mëttwoch",
-      "date": "20261021"
+      "date": "20261028"
     },
     {
       "weekday": "Donneschdeg",
-      "date": "20261022"
+      "date": "20261029"
     },
     {
       "weekday": "Freideg",
-      "date": "20261023"
+      "date": "20261030"
     },
     {
       "weekday": "Samschdeg",
-      "date": "20261024"
+      "date": "20261031"
     },
     {
       "weekday": "Sonndeg",
-      "date": "20261025"
+      "date": "20261101"
     }
   ],
-  "hours_baseline": 124.15664,
-  "km_baseline": 1620.669,
+  "hours_baseline": 134.379418,
+  "km_baseline": 1810.264,
   "activity_baselines": {
     "velo": {
-      "km": 971.15,
-      "hours": 47.035556
+      "km": 1146.69,
+      "hours": 54.039723
     },
     "laafen": {
-      "km": 637.67,
-      "hours": 64.026944
+      "km": 648.5,
+      "hours": 65.230277
     },
     "kraft": {
       "km": 0.0,
       "hours": 7.484723
     },
     "schwammen": {
-      "km": 11.849,
-      "hours": 5.608889
+      "km": 15.074,
+      "hours": 7.624167
     }
   }
 }
