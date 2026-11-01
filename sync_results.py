@@ -147,7 +147,9 @@ def parse_time_to_seconds(t):
     if not t:
         return 0
     try:
-        parts = [int(p) for p in t.strip().split(":")]
+        raw = t.strip().split(":")
+        # seconds may carry tenths/hundredths ("57:25,8" from the FIT automation)
+        parts = [int(p) for p in raw[:-1]] + [round(float(raw[-1].replace(",", ".")))]
     except (ValueError, TypeError):
         print(f"WARNING: couldn't parse Zäit value {t!r} (expected M:SS or H:MM:SS), treating as 0s", file=sys.stderr)
         return 0
