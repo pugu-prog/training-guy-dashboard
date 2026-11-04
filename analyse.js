@@ -196,6 +196,24 @@
     ].forEach(function (t) { tiles.append(el('div', 'an-tile', '<span>' + t[0] + '</span><b>' + t[1] + '</b>')); });
     root.append(tiles);
 
+    // Pro Sport: km, Stonnen, Trainingen, leschten Training (dës Woch extra)
+    var wk0 = monday(new Date().toISOString().slice(0, 10));
+    var ps = el('div', 'an-tiles an-sports');
+    SPORTS.forEach(function (s) {
+      var rs = jot.filter(function (r) { return r.sport === s; });
+      if (!rs.length) return;
+      var km = sum(rs, function (r) { return r.km; }), h = sum(rs, function (r) { return r.time_min; }) / 60;
+      var last = rs.reduce(function (m, r) { return r.date > m ? r.date : m; }, '');
+      var now = rs.filter(function (r) { return r.date >= wk0; });
+      var t = el('div', 'an-tile an-sport');
+      t.style.borderLeftColor = SCOL[s];
+      t.innerHTML = '<span>' + SNAME[s] + '</span><b>' + (s === 'Kraft' ? num(h, 1) + ' h' : num(km, 0) + ' km') + '</b>' +
+        '<small>' + (s === 'Kraft' ? '' : num(h, 1) + ' h \u00b7 ') + rs.length + ' Trainingen<br>Lescht: ' + day(last) +
+        (now.length ? '<br>Dës Woch: ' + (s === 'Kraft' ? hm(sum(now, function (r) { return r.time_min; })) + ' h' : num(sum(now, function (r) { return r.km; }), 1) + ' km') : '') + '</small>';
+      ps.append(t);
+    });
+    root.append(ps);
+
     function section(title) { root.append(el('h2', null, title)); var gr = el('div', 'an-grid'); root.append(gr); return gr; }
     function card(parent, title, take, how, short) {
       var c = el('div', 'an-card');
