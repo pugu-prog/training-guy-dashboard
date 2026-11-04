@@ -6,7 +6,8 @@ PBKDF2-SHA256). Am Browser entschlësselt analyse.js mat WebCrypto.
 
   python3 analyse_verschlesselen.py [--bericht ~/Claude/Apps/training-fit-cloud/bericht]
 
-D'Passwuert gëtt agetippt (getpass) oder kënnt aus ANALYSE_PASSWUERT. Ni committen.
+D'Passwuert gëtt agetippt (Mac-Fënster) oder kënnt aus ANALYSE_PASSWUERT (GitHub-Secret am Repo training-fit). Ni committen.
+Geet déi bestoend Datei net mam Passwuert op, brécht d'Script of (ausser mat --nei-passwuert).
 """
 import base64, datetime, getpass, json, os, subprocess, sys
 
@@ -56,9 +57,22 @@ def main():
     if len(pw) < 10:
         sys.exit("Passwuert ze kuerz (mindestens 10 Zeechen).")
 
+    payload = json.dumps({"sessions": sessions, "jotform": jotform}, ensure_ascii=False, separators=(",", ":")).encode()
+
+    # Bestoend Datei: muss mat dësem Passwuert opgoen (soss wier de Guy ausgespaart), an nëmmen nei schreiwen wann eppes geännert huet
+    if os.path.exists(OUT) and "--nei-passwuert" not in a:
+        old = json.load(open(OUT))
+        try:
+            k = PBKDF2HMAC(algorithm=hashes.SHA256(), length=32, salt=base64.b64decode(old["salt"]), iterations=old["iter"]).derive(pw.encode())
+            plain = AESGCM(k).decrypt(base64.b64decode(old["iv"]), base64.b64decode(old["ct"]), None)
+        except Exception:
+            sys.exit("Passwuert passt net zur bestoender analyse.enc.json. Fir en neit Passwuert: --nei-passwuert")
+        if plain == payload:
+            print("Keng Ännerung, analyse.enc.json bleift.")
+            return
+
     salt, iv = os.urandom(16), os.urandom(12)
     key = PBKDF2HMAC(algorithm=hashes.SHA256(), length=32, salt=salt, iterations=ITER).derive(pw.encode())
-    payload = json.dumps({"sessions": sessions, "jotform": jotform}, ensure_ascii=False, separators=(",", ":")).encode()
     ct = AESGCM(key).encrypt(iv, payload, None)
 
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
