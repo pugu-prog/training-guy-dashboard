@@ -15,9 +15,19 @@ Persönlechen Trainings-Dashboard vum Guy (Laafen, Vëlo, Kraft, Schwammen). Sta
 | `data/current-week.json` | Steiert de Sync: aktuell Woch, 7 Datumer, Baselines |
 | `sync_results.py` | Gëtt vun `.github/workflows/results-sync.yml` all 3 Stonnen (Cron `0 */3 * * *` UTC) gestart; schreift Jotform-Resultater an d'oppe Woch |
 | `training.ics` | Statesche Kalenner fir déi aktuell Woch |
+| `analyse.js`, `analyse.css` | Tab "Analyse" (béid Säiten): entschlësselt `data/analyse.enc.json` am Browser a mécht d'Charts. No Ännerungen `?v=N` an béide HTML-Dateien eropsetzen (Cache). |
+| `data/analyse.enc.json` | FIT-Analyse, AES-256-GCM-verschlësselt (PBKDF2-SHA256, 600 000 Ronnen). Gëtt vun `analyse_verschlesselen.py` gemaach. |
+| `analyse_verschlesselen.py` | Liest `~/Claude/Apps/training-fit-cloud/bericht/{sessions,jotform}-Guy.json` (vu `bericht.py`) a verschlësselt se. Passwuert tippt de Guy selwer (getpass) |
 | `manifest.json`, Icons, `.nojekyll` | änneren net |
 
 **Regel:** `index.html` an `trainer.html` ëmmer zesummen änneren (selwecht Day-Grid, Archiv, `WEEK_HISTORY`, Gesamt Iwwersiicht). All Woch steet an all HTML-Datei **zweemol**: uewen als aktuell Woch an als oppenen `<details class="week">` am Archiv. Ännerunge musse béid Plazen treffen.
+
+## Tab "Analyse" (verschlësselt)
+
+- Tabs uewen: `<nav class="tabs">` mat `#iwwersiicht` / `#analyse`, Container `<div id="analyse"></div>` (gëtt vu JS gefëllt, keng `day`/`stat`-Klassen, domat de Sync en net beréiert).
+- D'FIT-Donnéeën (Pulszonen, TSS, Drift, Watt) sinn Gesondheetsdonnéeën: **ni onverschlësselt** an dëse Repo. Passwuert ni an Dateien, Commits oder am Chat.
+- Aktualiséieren: am privaten Repo `bericht.py` lafen loossen, duerno `python3 analyse_verschlesselen.py` (Guy tippt d'Passwuert), `data/analyse.enc.json` committen.
+- "Op dësem Apparat verhalen" späichert e net-exportéierbare WebCrypto-Schlëssel an der IndexedDB; "Spären" läscht en.
 
 ## Externt
 

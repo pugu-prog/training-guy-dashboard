@@ -12,6 +12,7 @@
 <meta name="theme-color" content="#0f6e56">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" href="icon-512.png">
+<link rel="stylesheet" href="analyse.css?v=3">
 <style>
   :root { color-scheme: light; }
   * { box-sizing: border-box; }
@@ -80,6 +81,9 @@
   <h1>Training Guy</h1>
   <p class="sub">Iwwersiicht fir den Trainer &middot; nëmmen liesen</p>
   <span class="tag">Trainer-Usiicht</span>
+
+  <nav class="tabs" aria-label="Usiicht"><a href="#iwwersiicht" aria-current="page">Iwwersiicht</a><a href="#analyse">Analyse</a></nav>
+  <div id="analyse"></div>
 
   <div class="card" style="margin-bottom:16px; text-align:center;">
     <p style="font-weight:700; font-size:15px; margin:0; color:#1a1a18;">Trainingsprogramm Guy, Woch 18</p>
@@ -655,6 +659,7 @@ Fräi oder Schwammen</div><details class="result result-done"><summary class="re
   <footer>Training Guy &middot; Trainer-Usiicht &middot; gëtt all Woch aktualiséiert</footer>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="analyse.js?v=3"></script>
 <script>
   var WEEK_HISTORY = [
     { label: "Woch 1", laafen: 24.5, velo: 59.9, schwammen: 0, stonnen: 5.2, total: 84.4 },
