@@ -53,7 +53,7 @@ def main():
     sessions = json.load(open(os.path.join(src, "sessions-Guy.json")))
     jotform = json.load(open(os.path.join(src, "jotform-Guy.json")))
 
-    pw = os.environ.get("ANALYSE_PASSWUERT") or ask()
+    pw = os.environ.get("ANALYSE_PASSWUERT", "").rstrip("\r\n") or ask()   # Zeilenëmbroch vum Kopéieren an de Secret ewech
     if len(pw) < 10:
         sys.exit("Passwuert ze kuerz (mindestens 10 Zeechen).")
 
