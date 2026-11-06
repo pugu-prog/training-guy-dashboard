@@ -60,6 +60,7 @@ def main():
     payload = json.dumps({"sessions": sessions, "jotform": jotform}, ensure_ascii=False, separators=(",", ":")).encode()
 
     # Bestoend Datei: muss mat dësem Passwuert opgoen (soss wier de Guy ausgespaart), an nëmmen nei schreiwen wann eppes geännert huet
+    old_salt = None
     if os.path.exists(OUT) and "--nei-passwuert" not in a:
         old = json.load(open(OUT))
         try:
@@ -70,8 +71,9 @@ def main():
         if plain == payload:
             print("Keng Ännerung, analyse.enc.json bleift.")
             return
+        old_salt = base64.b64decode(old["salt"])   # Salt behalen: dann bleift de gespäicherte Schlëssel um Apparat gülteg (nëmmen den IV ass nei)
 
-    salt, iv = os.urandom(16), os.urandom(12)
+    salt, iv = old_salt or os.urandom(16), os.urandom(12)
     key = PBKDF2HMAC(algorithm=hashes.SHA256(), length=32, salt=salt, iterations=ITER).derive(pw.encode())
     ct = AESGCM(key).encrypt(iv, payload, None)
 

@@ -30,6 +30,7 @@ Persönlechen Trainings-Dashboard vum Guy (Laafen, Vëlo, Kraft, Schwammen). Sta
 - Vun Hand: `python3 analyse_verschlesselen.py` (Mac-Fënster fir d'Passwuert). Passt d'Passwuert net zur bestoender Datei, brécht d'Script of; neit Passwuert nëmme mat `--nei-passwuert` (dann och de Secret änneren).
 - **Mobilitéit & Stabi** (Kuerzbefehl „Stabi FIT“, Notiz `Typ: Mobilitéit`): just an der Analyse (Kaart, Stonnen pro Woch, Minutte pro Dag), ni am Jotform an ni an den Dag-Kaarten.
 - "Op dësem Apparat verhalen" späichert e net-exportéierbare WebCrypto-Schlëssel an der IndexedDB; "Spären" läscht en.
+  Dee gespäicherte Schlëssel hänkt um **Salt** vun `analyse.enc.json`: `analyse_verschlesselen.py` muss dofir bei all Update den Salt vun der bestoender Datei behalen (nëmmen den IV ass nei), soss muss de Guy no all Sync (3 h) d'Passwuert nei tippen. Net erëm op `os.urandom` fir de Salt änneren, ausser bei `--nei-passwuert`. iOS (Safari an Homescreen-App hunn getrennte Späicher; ITP kann no 7 Deeg ouni Notzung läschen) brauch dann nach eemol d'Passwuert.
 
 ## Externt
 
@@ -118,3 +119,8 @@ Zil: `.fit`-Dateien (Auer/Vëlo-Computer) importéieren, fir **exakt km pro Dag*
 - **Privatsphär (wichteg, d'Säit ass ëffentlech):** Op der Kaart déi éischt an déi lescht ~300 m vun der Streck ewechloossen (sou datt de Start/Doheem net ze gesinn ass). Nëmmen eng reduzéiert, ofgeleet JSON pro Sessioun publizéieren (z. B. `data/sessions/YYYYMMDD-N.json`, Track ausgedënnt), **net déi rau `.fit`-Dateien**. Déi rau Dateien nom Veraarbechten aus dem Repo läschen oder ni committen (z. B. Upload an e privaten Drive/Release a just d'JSON publizéieren). Mam Guy ofklären, ier en Track live geet.
 - `index.html` an `trainer.html` béid upassen; Resultat-Block-Format a Faarwen wéi uewen beschriwwen behalen.
 - **Ufank:** Beim Guy no enger Beispill-`.fit` vum Laafen a vum Schwammen froen, an no sengem Apparat (Garmin/Polar/Wahoo/Apple …), ier eppes gebaut gëtt.
+
+## Paket-Takt in diesem Projekt
+
+- **Stand:** `data/current-week.json` an dës Datei. **Liwwerung:** Commit op `main` (`git pull --rebase origin main`), GitHub Pages ass no 1–2 Min. live. **Prüfung:** `git diff` liesen, Python-Syntax-Check, bei JS lokal am Browser (Mac + Handy-Gréisst), nom Push SHA-Verglach mat `curl`.
+- Keng Versiounsnummer ausser `?v=N` bei `analyse.js`/`analyse.css` (béid HTML-Dateien). Keng Gegenprüfer-Agenten néideg, ausser bei Verschlësselung/Datenverloscht.
