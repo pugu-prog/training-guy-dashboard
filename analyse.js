@@ -3,8 +3,9 @@
 (function () {
   var ENC_URL = 'data/analyse.enc.json';
   var SPORTS = ['Laafen', 'Rad', 'Schwammen', 'Kraft'];
-  var SNAME = { Laafen: 'Laafen', Rad: 'Vëlo', Schwammen: 'Schwammen', Kraft: 'Kraft' };
-  var SCOL = { Laafen: '#1d9e75', Rad: '#ef9f27', Schwammen: '#2fa8c9', Kraft: '#7f77dd' };
+  var SNAME = { Laafen: 'Laafen', Rad: 'Vëlo', Schwammen: 'Schwammen', Kraft: 'Kraft', Mobilitéit: 'Mobilitéit & Stabi' };
+  var SCOL = { Laafen: '#1d9e75', Rad: '#ef9f27', Schwammen: '#2fa8c9', Kraft: '#7f77dd', Mobilitéit: '#c2748a' };
+  var HOURS = ['Laafen', 'Rad', 'Schwammen', 'Kraft', 'Mobilitéit'];   // Mobilitéit & Stabi kënnt just aus de FITen (Kuerzbefehl „Stabi FIT“)
   var GOOD = '#1d9e75', MID = '#e0b43a', BAD = '#d4574a', MUTED = '#b4b2a9', INK = '#1a1a18';
   var MON = ['Jan.', 'Feb.', 'Mäe.', 'Abr.', 'Mee', 'Juni', 'Juli', 'Aug.', 'Sep.', 'Okt.', 'Nov.', 'Dez.'];
 
@@ -110,17 +111,17 @@
 
   // ---- Rechnen ----
   function monday(s) { var d = new Date(s + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() - (d.getUTCDay() + 6) % 7); return d.toISOString().slice(0, 10); }
-  function weekly(jot) {
+  function weekly(jot, ses) {
     var m = {};
-    jot.forEach(function (r) {
+    jot.concat(ses.filter(function (r) { return r.sport === 'Mobilitéit'; })).forEach(function (r) {
       var w = monday(r.date);
-      if (!m[w]) m[w] = { week: w, Laafen: 0, Rad: 0, Schwammen: 0, Kraft: 0, km: { Laafen: 0, Rad: 0, Schwammen: 0 } };
+      if (!m[w]) m[w] = { week: w, Laafen: 0, Rad: 0, Schwammen: 0, Kraft: 0, Mobilitéit: 0, km: { Laafen: 0, Rad: 0, Schwammen: 0 } };
       if (r.sport in m[w]) m[w][r.sport] += (r.time_min || 0) / 60;
       if (r.sport in m[w].km) m[w].km[r.sport] += r.km || 0;
     });
     return Object.keys(m).sort().map(function (k) { return m[k]; });
   }
-  function wtot(r) { return r.Laafen + r.Rad + r.Schwammen + r.Kraft; }
+  function wtot(r) { return r.Laafen + r.Rad + r.Schwammen + r.Kraft + r.Mobilitéit; }
   function intensity(ses) {
     var out = [];
     ['Laafen', 'Rad', 'All'].forEach(function (sp) {
@@ -174,7 +175,8 @@
 
     var g = jot.filter(function (r) { return r.gefill != null; });
     var since = jot.reduce(function (m, r) { return r.date < m ? r.date : m; }, '9999');
-    var wk = weekly(jot), full = wk.slice(0, -1);
+    var wk = weekly(jot, ses), full = wk.slice(0, -1);
+    var mob = ses.filter(function (r) { return r.sport === 'Mobilitéit'; });
     var it = intensity(ses), all = it.filter(function (r) { return r.sport === 'All'; })[0];
     var runs = ses.filter(function (r) { return r.sport === 'Laafen' && r.ef != null && r.time_min >= 10; });
     var eft = trend(runs, function (r) { return r.ef; });
@@ -213,6 +215,16 @@
         (now.length ? '<br>Dës Woch: ' + (s === 'Kraft' ? hm(sum(now, function (r) { return r.time_min; })) + ' h' : num(sum(now, function (r) { return r.km; }), 1) + ' km') : '') + '</small>';
       ps.append(t);
     });
+    if (mob.length) {
+      var mnow = mob.filter(function (r) { return r.date >= wk0; });
+      var mdays = {}; mnow.forEach(function (r) { mdays[r.date] = 1; });
+      var mt = el('div', 'an-tile an-sport');
+      mt.style.borderLeftColor = SCOL.Mobilitéit;
+      mt.innerHTML = '<span>' + SNAME.Mobilitéit + '</span><b>' + num(sum(mob, function (r) { return r.time_min; }) / 60, 1) + ' h</b>' +
+        '<small>' + mob.length + ' Sessiounen<br>Lescht: ' + day(mob.reduce(function (m, r) { return r.date > m ? r.date : m; }, '')) +
+        (mnow.length ? '<br>Dës Woch: ' + Object.keys(mdays).length + ' Deeg \u00b7 ' + num(sum(mnow, function (r) { return r.time_min; }), 0) + ' min' : '') + '</small>';
+      ps.append(mt);
+    }
     root.append(ps);
 
     function section(title) { root.append(el('h2', null, title)); var gr = el('div', 'an-grid'); root.append(gr); return gr; }
@@ -234,7 +246,7 @@
       'All Balken ass eng Woch (vu Méindeg u). D’Faarwen weisen de Sport. Déi gestrachelt Linn ass de Schnëtt. Déi lescht Woch ass nach net fäerdeg.');
     chart(b1, {
       type: 'bar',
-      data: { labels: wk.map(function (r) { return day(r.week); }), datasets: SPORTS.map(function (s) {
+      data: { labels: wk.map(function (r) { return day(r.week); }), datasets: HOURS.filter(function (s) { return s !== 'Mobilitéit' || mob.length; }).map(function (s) {
         return { label: SNAME[s], data: wk.map(function (r) { return +r[s].toFixed(2); }), backgroundColor: SCOL[s], stack: 'h' };
       }) },
       options: {
@@ -271,15 +283,34 @@
     var kt = el('div', 'an-card');
     kt.append(el('h3', null, 'Zuelen pro Woch'));
     var ktb = el('div', 'an-tablebox'), ktt = el('table', 'an-table an-weeks');
-    ktt.innerHTML = '<thead><tr><th>Woch vum</th><th>Laafen</th><th>Vëlo</th><th>Schwammen</th><th>Kraft</th><th>Total Stonnen</th></tr></thead>';
+    ktt.innerHTML = '<thead><tr><th>Woch vum</th><th>Laafen</th><th>Vëlo</th><th>Schwammen</th><th>Kraft</th>' + (mob.length ? '<th>Mobilitéit</th>' : '') + '<th>Total Stonnen</th></tr></thead>';
     var ktbody = el('tbody');
     wk.slice().reverse().forEach(function (r) {
       var tr = el('tr');
-      [day(r.week) + ' ' + r.week.slice(0, 4), num(r.km.Laafen, 1) + ' km', num(r.km.Rad, 1) + ' km', num(r.km.Schwammen, 2) + ' km', hm(r.Kraft * 60) + ' h', num(wtot(r), 1) + ' h']
+      [day(r.week) + ' ' + r.week.slice(0, 4), num(r.km.Laafen, 1) + ' km', num(r.km.Rad, 1) + ' km', num(r.km.Schwammen, 2) + ' km', hm(r.Kraft * 60) + ' h'].concat(mob.length ? [hm(r.Mobilitéit * 60) + ' h'] : [], [num(wtot(r), 1) + ' h'])
         .forEach(function (v) { var td = el('td'); td.textContent = v; tr.append(td); });
       ktbody.append(tr);
     });
     ktt.append(ktbody); ktb.append(ktt); kt.append(ktb); s1.append(kt);
+
+    // Mobilitéit & Stabi: Minutte pro Dag, lescht 28 Deeg
+    if (mob.length) {
+      var dd = [], t0 = new Date(new Date().toISOString().slice(0, 10) + 'T00:00:00Z');
+      for (var i = 27; i >= 0; i--) { var d = new Date(t0); d.setUTCDate(d.getUTCDate() - i); dd.push(d.toISOString().slice(0, 10)); }
+      var per = dd.map(function (d) { return sum(mob.filter(function (r) { return r.date === d; }), function (r) { return r.time_min; }); });
+      var on = per.filter(function (v) { return v > 0; }).length;
+      var bm = card(s1, 'Mobilitéit & Stabi', 'Lescht 4 Wochen: <b>' + on + '</b> vun 28 Deeg, am Schnëtt <b>' + (on ? num(sum(per, Number) / on, 0) : '\u2014') + ' min</b> pro Dag mat Übungen.',
+        'All Balken ass en Dag. D\u2019Héicht sinn d\u2019Minutte Mobilitéit- a Stabi-Übungen (aus der Auer, Kuerzbefehl \u201eStabi FIT\u201c). Dës Sessioune stinn just hei an der Analyse, net um Dashboard.', true);
+      chart(bm, {
+        type: 'bar',
+        data: { labels: dd.map(day), datasets: [{ label: SNAME.Mobilitéit, data: per.map(function (v) { return +v.toFixed(1); }), backgroundColor: SCOL.Mobilitéit, borderRadius: 2 }] },
+        options: {
+          scales: { x: { grid: { display: false }, ticks: { autoSkipPadding: 8, maxRotation: 0 } }, y: { beginAtZero: true, ticks: { callback: function (v) { return v + ' min'; } } } },
+          plugins: { legend: { display: false }, tooltip: { callbacks: { label: function (i) { var r = mob.filter(function (x) { return x.date === dd[i.dataIndex]; });
+            return [num(i.raw, 0) + ' min'].concat(r.length && r[0].hr_avg ? ['Ø Puls ' + r[0].hr_avg] : []); } } } }
+        }
+      });
+    }
 
     // Wéi ustrengend?
     var s2 = section('Wéi ustrengend ass mäin Training?');
