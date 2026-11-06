@@ -44,3 +44,5 @@
   .an-table th[aria-sort] button::after { content: " \25BE"; color: #8a8983; }
   .an-table th[aria-sort="ascending"] button::after { content: " \25B4"; }
   @media (min-width: 640px) { .an-grid.an-two { grid-template-columns: 1fr 1fr; } }
+  .an-table.an-weeks th:nth-child(2), .an-table.an-weeks td:nth-child(2) { text-align: right; }
+  .an-table th:first-child, .an-table td:first-child { padding-left: 16px; } .an-table th:last-child, .an-table td:last-child { padding-right: 16px; }

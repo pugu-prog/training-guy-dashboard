@@ -114,8 +114,9 @@
     var m = {};
     jot.forEach(function (r) {
       var w = monday(r.date);
-      if (!m[w]) m[w] = { week: w, Laafen: 0, Rad: 0, Schwammen: 0, Kraft: 0 };
+      if (!m[w]) m[w] = { week: w, Laafen: 0, Rad: 0, Schwammen: 0, Kraft: 0, km: { Laafen: 0, Rad: 0, Schwammen: 0 } };
       if (r.sport in m[w]) m[w][r.sport] += (r.time_min || 0) / 60;
+      if (r.sport in m[w].km) m[w].km[r.sport] += r.km || 0;
     });
     return Object.keys(m).sort().map(function (k) { return m[k]; });
   }
@@ -247,6 +248,38 @@
       },
       plugins: [refLines]
     });
+
+    // Kilometer pro Woch a Sport, Kraft a Stonnen
+    var KM = ['Laafen', 'Rad', 'Schwammen'];
+    var bk = card(s1, 'Kilometer pro Woch', 'Déi lescht komplett Woch: ' + (full.length ? KM.map(function (s) { return SNAME[s] + ' <b>' + num(full[full.length - 1].km[s], 1) + ' km</b>'; }).join(', ') + ', Kraft <b>' + hm(full[full.length - 1].Kraft * 60) + ' h</b>' : '\u2014') + '.',
+      'D\u2019Balke sinn d\u2019Kilometer pro Sport an der Woch (vu Méindeg u), lénks Achs. D\u2019Linn ass d\u2019Kraft a Stonnen, riets Achs. Déi lescht Woch ass nach net fäerdeg.');
+    chart(bk, {
+      type: 'bar',
+      data: { labels: wk.map(function (r) { return day(r.week); }), datasets: KM.map(function (s) {
+        return { label: SNAME[s], data: wk.map(function (r) { return +r.km[s].toFixed(2); }), backgroundColor: SCOL[s], yAxisID: 'y' };
+      }).concat([{ type: 'line', label: 'Kraft (h)', data: wk.map(function (r) { return +r.Kraft.toFixed(2); }), borderColor: SCOL.Kraft, backgroundColor: SCOL.Kraft, pointRadius: 3, tension: 0.2, yAxisID: 'y1' }]) },
+      options: {
+        interaction: { mode: 'index', intersect: false },
+        scales: { x: { grid: { display: false }, ticks: { autoSkipPadding: 8, maxRotation: 0 } },
+          y: { beginAtZero: true, ticks: { callback: function (v) { return v + ' km'; } } },
+          y1: { beginAtZero: true, position: 'right', grid: { drawOnChartArea: false }, ticks: { callback: function (v) { return v + ' h'; } } } },
+        plugins: { legend: legend(), tooltip: { callbacks: {
+          title: function (i) { return 'Woch vum ' + i[0].label; },
+          label: function (i) { return i.dataset.yAxisID === 'y1' ? 'Kraft ' + hm(i.raw * 60) + ' h' : i.dataset.label + ' ' + num(i.raw, 1) + ' km'; } } } }
+      }
+    });
+    var kt = el('div', 'an-card');
+    kt.append(el('h3', null, 'Zuelen pro Woch'));
+    var ktb = el('div', 'an-tablebox'), ktt = el('table', 'an-table an-weeks');
+    ktt.innerHTML = '<thead><tr><th>Woch vum</th><th>Laafen</th><th>Vëlo</th><th>Schwammen</th><th>Kraft</th><th>Total Stonnen</th></tr></thead>';
+    var ktbody = el('tbody');
+    wk.slice().reverse().forEach(function (r) {
+      var tr = el('tr');
+      [day(r.week) + ' ' + r.week.slice(0, 4), num(r.km.Laafen, 1) + ' km', num(r.km.Rad, 1) + ' km', num(r.km.Schwammen, 2) + ' km', hm(r.Kraft * 60) + ' h', num(wtot(r), 1) + ' h']
+        .forEach(function (v) { var td = el('td'); td.textContent = v; tr.append(td); });
+      ktbody.append(tr);
+    });
+    ktt.append(ktbody); ktb.append(ktt); kt.append(ktb); s1.append(kt);
 
     // Wéi ustrengend?
     var s2 = section('Wéi ustrengend ass mäin Training?');
