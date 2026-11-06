@@ -28,6 +28,7 @@ Persönlechen Trainings-Dashboard vum Guy (Laafen, Vëlo, Kraft, Schwammen). Sta
 - D'FIT-Donnéeën (Pulszonen, TSS, Drift, Watt) sinn Gesondheetsdonnéeën: **ni onverschlësselt** an dëse Repo. Passwuert ni an Dateien, Commits oder am Chat.
 - Aktualiséieren geet **automatesch**: Workflow `analyse.yml` am privaten Repo `pugu-prog/training-fit` (no all FIT iwwer `fit.yml`, an all 3 Stonnen um :10, also 10 min nom Resultater-Sync). E rechent `bericht.py`, verschlësselt mam Secret `ANALYSE_PASSWUERT` a pusht `data/analyse.enc.json` mam Secret `DASHBOARD_TOKEN` ("Analyse aktualiséiert (automatesch)"). Nëmme bei neien Donnéeën gëtt e Commit.
 - Vun Hand: `python3 analyse_verschlesselen.py` (Mac-Fënster fir d'Passwuert). Passt d'Passwuert net zur bestoender Datei, brécht d'Script of; neit Passwuert nëmme mat `--nei-passwuert` (dann och de Secret änneren).
+- **Mobilitéit & Stabi** (Kuerzbefehl „Stabi FIT“, Notiz `Typ: Mobilitéit`): just an der Analyse (Kaart, Stonnen pro Woch, Minutte pro Dag), ni am Jotform an ni an den Dag-Kaarten.
 - "Op dësem Apparat verhalen" späichert e net-exportéierbare WebCrypto-Schlëssel an der IndexedDB; "Spären" läscht en.
 
 ## Externt
