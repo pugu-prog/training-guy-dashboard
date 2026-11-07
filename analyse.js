@@ -215,13 +215,19 @@
         (now.length ? '<br>Dës Woch: ' + (s === 'Kraft' ? hm(sum(now, function (r) { return r.time_min; })) + ' h' : num(sum(now, function (r) { return r.km; }), 1) + ' km') : '') + '</small>';
       ps.append(t);
     });
+    function aartTxt(rs) {   // Mobility / Stabi / Force: wéi oft ofgehaakt (eng Sessioun kann méi sinn)
+      var c = {};
+      rs.forEach(function (r) { (r.aart || '').split(',').forEach(function (a) { a = a.trim(); if (a) c[a] = (c[a] || 0) + 1; }); });
+      var k = Object.keys(c);
+      return k.length ? ' (' + k.map(function (a) { return esc(a) + ' ' + c[a]; }).join(' \u00b7 ') + ')' : '';
+    }
     if (mob.length) {
       var mnow = mob.filter(function (r) { return r.date >= wk0; });
       var mdays = {}; mnow.forEach(function (r) { mdays[r.date] = 1; });
       var mt = el('div', 'an-tile an-sport');
       mt.style.borderLeftColor = SCOL.Mobilitéit;
       mt.innerHTML = '<span>' + SNAME.Mobilitéit + '</span><b>' + num(sum(mob, function (r) { return r.time_min; }) / 60, 1) + ' h</b>' +
-        '<small>' + mob.length + ' Sessiounen<br>Lescht: ' + day(mob.reduce(function (m, r) { return r.date > m ? r.date : m; }, '')) +
+        '<small>' + mob.length + ' Sessiounen' + aartTxt(mob) + '<br>Lescht: ' + day(mob.reduce(function (m, r) { return r.date > m ? r.date : m; }, '')) +
         (mnow.length ? '<br>Dës Woch: ' + Object.keys(mdays).length + ' Deeg \u00b7 ' + num(sum(mnow, function (r) { return r.time_min; }), 0) + ' min' : '') + '</small>';
       ps.append(mt);
     }
