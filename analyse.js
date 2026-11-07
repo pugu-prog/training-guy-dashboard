@@ -319,6 +319,35 @@
     }
 
     // Wéi ustrengend?
+    // Fitness (CTL, 42 Deeg), Middegkeet (ATL, 7 Deeg), Form (TSB = CTL - ATL) aus der Belaaschtung (TSS/hrTSS) pro Dag
+    var fload = {}; ses.forEach(function (r) { if (r.load) fload[r.date] = (fload[r.date] || 0) + r.load; });
+    var fdk = Object.keys(fload).sort();
+    try { if (fdk.length >= 5) {
+      var fd = [], d0 = new Date(fdk[0] + 'T00:00:00Z'), dn = new Date(new Date().toISOString().slice(0, 10) + 'T00:00:00Z'), ctl = 0, atl = 0;
+      for (var dt = d0; dt <= dn; dt = new Date(dt.getTime() + 864e5)) {
+        var ds = dt.toISOString().slice(0, 10), l = fload[ds] || 0;
+        ctl += (l - ctl) / 42; atl += (l - atl) / 7;
+        fd.push({ d: ds, ctl: ctl, atl: atl, tsb: ctl - atl });
+      }
+      var fw = fd.slice(-120), fl = fd[fd.length - 1];
+      var s1b = section('Fitness a Form');
+      var fform = fl.tsb > 10 ? 'ganz frësch (méiglecherweis ze vill Rou)' : fl.tsb >= -10 ? 'ausgewoge' : fl.tsb >= -30 ? 'midd, awer am Opbau' : 'staark midd, Gefor vun Iwwerbelaaschtung';
+      var bf1 = card(s1b, 'Fitness a Middegkeet', 'Fitness <b>' + num(fl.ctl, 0) + '</b> \u00b7 Middegkeet <b>' + num(fl.atl, 0) + '</b>.',
+        'Gréng ass d\u2019Fitness (Schnëtt vun de leschte ~6 Wochen), orange d\u2019Middegkeet (lescht ~7 Deeg). Steigt d\u2019Gréng lues, gëtt d\u2019Fitness besser. Ass d\u2019Orange wäit driwwer, ass de Kierper midd. Berechent aus TSS (hrTSS wann keng Watt).');
+      chart(bf1, { type: 'line',
+        data: { labels: fw.map(function (r) { return day(r.d); }), datasets: [
+          { label: 'Fitness', data: fw.map(function (r) { return +r.ctl.toFixed(1); }), borderColor: '#1d9e75', backgroundColor: '#1d9e75', pointRadius: 0, borderWidth: 2, tension: 0.3 },
+          { label: 'Middegkeet', data: fw.map(function (r) { return +r.atl.toFixed(1); }), borderColor: '#ef9f27', backgroundColor: '#ef9f27', pointRadius: 0, borderWidth: 2, tension: 0.3 }] },
+        options: { scales: { x: { grid: { display: false }, ticks: { autoSkipPadding: 16, maxRotation: 0 } }, y: { beginAtZero: true } },
+          interaction: { mode: 'index', intersect: false }, plugins: { legend: legend() } } });
+      var bf2 = card(s1b, 'Form', 'Haut: <b>' + (fl.tsb > 0 ? '+' : '') + num(fl.tsb, 0) + '</b> \u2013 ' + fform + '.',
+        'Form ass Fitness minus Middegkeet. Iwwer 0: frësch. Tëscht 0 an \u221220: normal Trainingsmëtt. Ënner \u221230: Rou virgesinn. Virum Wettkampf ass +5 bis +15 gutt.', true);
+      chart(bf2, { type: 'bar',
+        data: { labels: fw.map(function (r) { return day(r.d); }), datasets: [{ label: 'Form', data: fw.map(function (r) { return +r.tsb.toFixed(1); }),
+          backgroundColor: fw.map(function (r) { return r.tsb >= 0 ? '#1d9e75' : r.tsb >= -30 ? '#ef9f27' : '#d85a5a'; }), borderRadius: 1 }] },
+        options: { scales: { x: { grid: { display: false }, ticks: { autoSkipPadding: 16, maxRotation: 0 } } }, plugins: { legend: { display: false } } } });
+} } catch (e) { /* Fitness-Sektioun ass optionell */ }
+
     var s2 = section('Wéi ustrengend ass mäin Training?');
     s2.classList.add('an-two');
     var INAME = { Laafen: 'Laafen', Rad: 'Vëlo', All: 'Zesummen' };
