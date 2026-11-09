@@ -25,6 +25,7 @@ import json
 import os
 import re
 import sys
+import unicodedata
 import urllib.request
 import urllib.error
 
@@ -41,15 +42,50 @@ def fetch_submissions():
     if not API_KEY:
         print("JOTFORM_API_KEY not set", file=sys.stderr)
         sys.exit(1)
-    url = f"https://api.jotform.com/form/{FORM_ID}/submissions?apiKey={API_KEY}&limit=200&orderby=created_at"
-    try:
-        with urllib.request.urlopen(url, timeout=30) as r:
-            data = json.load(r)
-    except urllib.error.URLError as e:
-        print(f"Jotform API request failed: {e}", file=sys.stderr)
-        sys.exit(1)
+    # Jotform returns one page per call (formerly limit=200 cut off the newest
+    # entries once the form had more than 200 submissions) -> read all pages.
+    page = 500
+    offset = 0
+    content = []
+    seen = set()
+    while True:
+        url = (f"https://api.jotform.com/form/{FORM_ID}/submissions?apiKey={API_KEY}"
+               f"&limit={page}&offset={offset}&orderby=created_at")
+        try:
+            with urllib.request.urlopen(url, timeout=30) as r:
+                data = json.load(r)
+        except urllib.error.URLError as e:
+            print(f"Jotform API request failed: {e}", file=sys.stderr)
+            sys.exit(1)
+        batch = data.get("content", [])
+        for sub in batch:
+            if sub.get("id") not in seen:
+                seen.add(sub.get("id"))
+                content.append(sub)
+        if len(batch) < page:
+            break
+        offset += page
     # Jotform also returns submissions deleted in the inbox (status DELETED); skip them
-    return [s for s in data.get("content", []) if s.get("status") != "DELETED"]
+    return [s for s in content if s.get("status") != "DELETED"]
+
+
+FIT_NOTE = re.compile(r"Automatesch aus FIT \(([^)]+)\)")
+
+
+def drop_duplicate_fit_entries(parsed):
+    """The FIT automation can post the same FIT twice (race between two runs);
+    count each FIT file only once."""
+    seen = set()
+    out = []
+    for p in parsed:
+        m = FIT_NOTE.search(p.get("bemierkung") or "")
+        if m:
+            key = unicodedata.normalize("NFC", m.group(1))
+            if key in seen:
+                continue
+            seen.add(key)
+        out.append(p)
+    return out
 
 
 def answer_by_name(answers, name):
@@ -795,7 +831,7 @@ def main():
     valid_dates = {d["date"] for d in week["days"]}
 
     raw_subs = fetch_submissions()
-    parsed = [parse_submission(s) for s in raw_subs]
+    parsed = drop_duplicate_fit_entries([parse_submission(s) for s in raw_subs])
     by_date = group_by_date(parsed, valid_dates)
 
     if not by_date:
