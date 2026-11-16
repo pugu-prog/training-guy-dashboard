@@ -124,3 +124,11 @@ Zil: `.fit`-Dateien (Auer/Vëlo-Computer) importéieren, fir **exakt km pro Dag*
 
 - **Stand:** `data/current-week.json` an dës Datei. **Liwwerung:** Commit op `main` (`git pull --rebase origin main`), GitHub Pages ass no 1–2 Min. live. **Prüfung:** `git diff` liesen, Python-Syntax-Check, bei JS lokal am Browser (Mac + Handy-Gréisst), nom Push SHA-Verglach mat `curl`.
 - Keng Versiounsnummer ausser `?v=N` bei `analyse.js`/`analyse.css` (béid HTML-Dateien). Keng Gegenprüfer-Agenten néideg, ausser bei Verschlësselung/Datenverloscht.
+
+## Wochewiessel AUTOMATESCH (zënter 16.11.2026, ouni Claude, ouni Token)
+
+- Script `~/Claude/Automatiounen/training-plan/wochewiessel.py`, gestart vun `~/Claude/Automatiounen/training-fit/run.sh` (launchd-Agent „Training FIT“, all 30 Min. + wann `FIT/` ännert; huet Full Disk Access fir iCloud). Log: `training-plan/wochewiessel.log`, Mac-Notifikatioun bei Erfolleg/Feeler.
+- Mécht NËMMEN eppes, wann `Plang/Guy 1.N.pdf` (N = Woch + 1) an iCloud `Guy Training/Plang` läit **an** haut no dem Sonndeg vun der aktueller Woch ass. Da: al Woch finaliséieren (Jotform → Resultater, Kommentar aus Zuelen, Baselines), nei Woch aus dem PDF (pypdf, Deeg Meindes…Sonndes, Klassifikatioun laaf/velo/schwamm/rescht), `current-week.json`, `training.ics`, commit + push (Git-Login vum Mac, Jotform-Schlëssel aus Schlësselbund `jotform-api`).
+- Ofhängegkeet: de PDF muss an `Plang/` landen (Guy kopéiert en dohinner), Mac un/wakeg. Net-erkannt Dag → Notifikatioun „kontrolléier …“. Test: `WW_REPO=<Klon op ale Stand> python3 wochewiessel.py --dry-run` (pusht näischt).
+- Handaarbecht (Woch ouni Plang, Plang-Ännerung mëtt an der Woch) bleift wéi uewen beschriwwen.
+- Den aale Scheduled Task `training-guy-wochewiessel` ass ofgeschalt, de Cowork-Skill `training-guy-dashboard-update` weist elo hei hin.
