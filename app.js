@@ -2,7 +2,7 @@
    Liest NËMMEN den Dag-Raster vun der Säit (#tab-woche) an data/shoes.json, kee Strava, keng Gesondheetsdonnéeën im Klaren.
    Wichteg: Sync-Muster am HTML (`<div class="day `, `<span class="day-name">`) net änneren – hei nëmme gelies. */
 (function () {
-  var TABS = ['heute', 'woche', 'verlauf', 'analyse', 'material'];
+  var TABS = ['heute', 'woche', 'verlauf', 'analyse', 'material', 'alles'];
   var MON = ['Jan.', 'Feb.', 'Mäerz', 'Abr.', 'Mee', 'Juni', 'Juli', 'Aug.', 'Sep.', 'Okt.', 'Nov.', 'Dez.'];
   var WD = ['Sonndeg', 'Méindeg', 'Dënschdeg', 'Mëttwoch', 'Donneschdeg', 'Freideg', 'Samschdeg'];
   var SHORT = { 'Méindeg': 'Mé', 'Dënschdeg': 'Dë', 'Mëttwoch': 'Më', 'Donneschdeg': 'Do', 'Freideg': 'Fr', 'Samschdeg': 'Sa', 'Sonndeg': 'So' };
@@ -10,16 +10,19 @@
   function num(v, d) { return (v == null ? '—' : v.toFixed(d).replace('.', ',')); }
 
   // ---- Tabs ----
-  function cur() { var h = (location.hash || '').slice(1); return TABS.indexOf(h) < 0 ? 'heute' : h; }
+  function cur() { var h = (location.hash || '').slice(1); if (h === 'formular') return 'material'; return TABS.indexOf(h) < 0 ? 'heute' : h; }
   function showTab() {
     var t = cur();
     TABS.forEach(function (x) { if (x !== 'analyse') document.body.classList.toggle('tab-' + x, x === t); });
     [].forEach.call(document.querySelectorAll('#bnav a'), function (a) {
       if (a.dataset.tab === t) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
     });
-    if (t === 'verlauf') { var d = $('statsDetails'); if (d && !d.open) d.open = true; }   // Grafik gëtt erëscht beim Opmaachen gezeechent
+    if (t === 'verlauf' || t === 'alles') { var d = $('statsDetails'); if (d && !d.open) d.open = true; }
+    if ((location.hash || '') === '#formular') {            // Knäppchen "Resultat / Krank agi" op Heute
+      var fd = $('formDetails'); if (fd) { fd.open = true; setTimeout(function () { fd.scrollIntoView({ block: 'start' }); }, 50); }
+    }   // Grafik gëtt erëscht beim Opmaachen gezeechent
   }
-  window.addEventListener('hashchange', function () { showTab(); window.scrollTo(0, 0); });
+  window.addEventListener('hashchange', function () { showTab(); if ((location.hash || '') !== '#formular') window.scrollTo(0, 0); });
   showTab();
 
   // ---- Dag-Raster liesen ----
@@ -56,7 +59,7 @@
     var now = new Date(), tIdx = -1;
     if (week && week.days) week.days.forEach(function (d, i) { if (d.date === ymd(now)) tIdx = i; });
     else { cs.forEach(function (c, i) { if (c.name === WD[now.getDay()]) tIdx = i; }); }
-    var html = '';
+    var html = $('formDetails') ? '<a class="hd-form" href="#formular">Resultat oder Krank / Ausgelooss aginn</a>' : '';
     if (tIdx < 0 || !cs[tIdx]) {
       html += '<div class="card hd"><div class="hd-top"><span class="hd-day">' + WD[now.getDay()] + ' · ' + now.getDate() + '. ' + MON[now.getMonth()] + '</span></div>' +
         '<div class="hd-desc">Haut ass kee Plang an der aktueller Woch. De Plang fir déi nei Woch kënnt, soubal de Coach en schéckt.</div></div>';

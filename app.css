@@ -2,7 +2,9 @@
 body { padding-bottom: calc(84px + env(safe-area-inset-bottom)); }
 .tabpanel { display: none; }
 body:not([class*="tab-"]) #tab-heute, body.tab-heute #tab-heute, body.tab-woche #tab-woche,
-body.tab-verlauf #tab-verlauf, body.tab-material #tab-material { display: block; }
+body.tab-verlauf #tab-verlauf, body.tab-material #tab-material,
+body.tab-alles #tab-woche, body.tab-alles #tab-verlauf, body.tab-alles #tab-material { display: block; }
+.hd-form { display: block; text-align: center; margin: 0 0 12px; padding: 12px 14px; border-radius: 12px; background: #0f6e56; color: #fff; font-weight: 600; font-size: 14px; text-decoration: none; }
 h2.first { margin-top: 0; }
 .bnav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; display: flex; background: #ffffff; border-top: 1px solid #e3e1d9;
   padding: 4px 4px calc(4px + env(safe-area-inset-bottom)); }
