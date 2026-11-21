@@ -391,11 +391,16 @@
       plugins: [refLines]
     });
 
+    function corosTxt(r) {
+      if (r.coros_tl != null) return 'Coros: ' + num(r.coros_tl, 0);
+      if (r.tl_model != null) return 'Coros-Schätzung ≈ ' + num(r.tl_model, 0) + ' (± 10 %)';
+      return '';
+    }
     var LV = [[50, 'Liicht (ënner 50)', GOOD], [100, 'Mëttel (50–100)', MUTED], [150, 'Schwéier (100–150)', MID], [Infinity, 'Ganz schwéier (iwwer 150)', BAD]];
     function lvl(v) { for (var i = 0; i < LV.length; i++) if (v < LV[i][0]) return LV[i]; }
     var ld = ses.filter(function (r) { return r.load != null; });
     var b3 = card(s2, 'Wéi vill huet all Training kascht?', 'D’Héicht vum Balken = Ustrengung a Punkten.',
-      'D’Punkte rechnen Dauer an Intensitéit zesummen. 100 Punkten = eng Stonn voll op der Schwell. Ënner 50 erhëlt ee sech bis den nächsten Dag, iwwer 150 brauch ee méi Deeg.');
+      'D’Punkte rechnen Dauer an Intensitéit zesummen. 100 Punkten = eng Stonn voll op der Schwell. Ënner 50 erhëlt ee sech bis den nächsten Dag, iwwer 150 brauch ee méi Deeg. Bei de Läf steet an der Info och d’Coros-Zuel: „≈“ heescht geschat (ongeféier ± 10 %, aus de Pulszonen gerechent), ouni „≈“ ass et déi echt Zuel vun der Auer. D’Form uewen gëtt (nach) net doriwwer gerechent.');
     chart(b3, {
       type: 'bar',
       data: { labels: ld.map(function (r) { return day(r.date); }), datasets: [{ data: ld.map(function (r) { return r.load; }), backgroundColor: ld.map(function (r) { return lvl(r.load)[2]; }), borderRadius: 2 }] },
@@ -404,7 +409,7 @@
         plugins: { legend: { display: true, position: 'top', align: 'start', labels: { boxWidth: 10, boxHeight: 10, font: { size: 11 },
             generateLabels: function () { return LV.map(function (l) { return { text: l[1], fillStyle: l[2], strokeStyle: l[2], lineWidth: 0 }; }); } }, onClick: function () {} },
           tooltip: { callbacks: { title: function (i) { return label(ld[i[0].dataIndex]); },
-            label: function (i) { var r = ld[i.dataIndex]; return [num(r.load, 0) + ' Punkten · ' + hm(r.time_min) + ' h', lvl(r.load)[1].split(' (')[0]]; } } } }
+            label: function (i) { var r = ld[i.dataIndex], o = [num(r.load, 0) + ' Punkten · ' + hm(r.time_min) + ' h', lvl(r.load)[1].split(' (')[0]]; var c = corosTxt(r); if (c) o.push(c); return o; } } } }
       }
     });
 
@@ -483,6 +488,7 @@
       ['ef', 'Meter/Schlag', function (r) { return r.ef == null || r.sport !== 'Laafen' ? '' : num(r.ef, 2) + ' m'; }],
       ['drift_pct', 'Puls-Drift', function (r) { return r.drift_pct == null ? '' : num(r.drift_pct, 1) + ' %'; }],
       ['load', 'Punkten', function (r) { return r.load == null ? '' : num(r.load, 0); }],
+      ['tl', 'Coros', function (r) { return r.coros_tl != null ? num(r.coros_tl, 0) : (r.tl_model != null ? '≈ ' + num(r.tl_model, 0) : ''); }],
       ['np', 'Watt', function (r) { return r.np == null ? '' : r.np; }],
       ['gefill', 'Gefill', function (r) { return r.gefill == null ? '' : r.gefill; }],
       ['gear', 'Material', function (r) { return r.gear || ''; }, 'l'],
@@ -506,7 +512,8 @@
     thead.append(hr);
     function fill() {
       var rows = ses.slice().sort(function (a, b) {
-        var va = sortKey === 'date' ? a.id : a[sortKey], vb = sortKey === 'date' ? b.id : b[sortKey];
+        var tlv = function (r) { return r.coros_tl != null ? r.coros_tl : r.tl_model; };
+        var va = sortKey === 'date' ? a.id : sortKey === 'tl' ? tlv(a) : a[sortKey], vb = sortKey === 'date' ? b.id : sortKey === 'tl' ? tlv(b) : b[sortKey];
         if (va == null) return 1; if (vb == null) return -1;
         return (typeof va === 'number' ? va - vb : String(va).localeCompare(String(vb))) * sortDir;
       });
