@@ -64,3 +64,7 @@
 .an-ramp { text-align: center; } .an-ramp span { font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums; } .an-ramp small { display: block; font-size: 11.5px; color: #8a8983; }
 .an-prgrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
 .an-prbox { position: relative; }
+
+.an-zb { border-top: 1px solid #e3e1d9; padding: 8px 0; } .an-zb summary { cursor: pointer; font-size: 14px; } .an-zb summary span { color: #8a8983; font-size: 12px; margin-left: 6px; }
+.an-zg { display: grid; gap: 3px 10px; margin: 8px 0 4px; font-size: 13px; font-variant-numeric: tabular-nums; } .an-zh { color: #8a8983; font-size: 11.5px; } .an-zn { font-weight: 600; }
+.an-zt { font-size: 12px; color: #8a8983; margin: 4px 0 0; }

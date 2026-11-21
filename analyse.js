@@ -434,6 +434,92 @@
       }
     });
 
+    // Trainingszonen (aus de lescht benotzte Schwellen, am Browser gerechent)
+    (function () {
+      function sec(s) { if (s == null) return null; var m = /^(\d+):(\d{2})$/.exec(String(s).trim()); return m ? +m[1] * 60 + +m[2] : null; }
+      function mmss(x) { x = Math.round(x); return Math.floor(x / 60) + ':' + String(x % 60).padStart(2, '0'); }
+      function last(sport, f) { for (var i = ses.length - 1; i >= 0; i--) if (ses[i].sport === sport && f(ses[i])) return ses[i]; return null; }
+      var HRN = ['Z1', 'Z2', 'Z3', 'Z4', 'Z5a', 'Z5b', 'Z5c'];
+      function hrRows(hr, f) {
+        return HRN.map(function (n, i) {
+          var lo = i ? Math.round(hr * f[i - 1]) : null, hi = i < f.length ? Math.round(hr * f[i]) - 1 : null;
+          return lo == null ? '< ' + (hi + 1) : hi == null ? '≥ ' + lo : lo + '–' + hi;
+        });
+      }
+      function block(title, stand, cols, rows, note) {
+        var d = el('details', 'an-zb');
+        d.append(el('summary', null, '<b>' + title + '</b> <span>' + stand + '</span>'));
+        var g = el('div', 'an-zg');
+        g.style.gridTemplateColumns = '34px repeat(' + cols.length + ', 1fr)';
+        g.append(el('span', 'an-zh', ''));
+        cols.forEach(function (c) { g.append(el('span', 'an-zh', c)); });
+        rows.forEach(function (r) { r.forEach(function (c, i) { g.append(el('span', i ? null : 'an-zn', c)); }); });
+        d.append(g);
+        if (note) d.append(el('p', 'an-zt', note));
+        return d;
+      }
+      function stand(r, kind) { return 'Schwell vum ' + day(r.date) + ' · ' + kind; }
+      var wrap = el('div', 'an-card');
+      wrap.append(el('h3', null, 'Trainingszonen'));
+      wrap.append(el('p', 'an-take', 'Déi aktuell Zonen no de lescht benotzte Schwellen. Tipp op eng Sport fir se opzemaachen.'));
+      var any = false;
+      var R = last('Laafen', function (r) { return r.thr_hr || r.thr_pace; });
+      if (R) {
+        var hr = +R.thr_hr, p = sec(R.thr_pace), h = hr ? hrRows(hr, [.85, .90, .95, 1.00, 1.02, 1.06]) : null;
+        var pf = [1.29, 1.14, 1.06, .99, .97, .90], pr = p ? HRN.map(function (n, i) {
+          return i === 0 ? '> ' + mmss(p * pf[0]) : i === 6 ? '< ' + mmss(p * pf[5]) : mmss(p * pf[i]) + '–' + mmss(p * pf[i - 1]);
+        }) : null;
+        var cols = [], rows = HRN.map(function (n) { return [n]; });
+        if (h) { cols.push('bpm'); h.forEach(function (x, i) { rows[i].push(x); }); }
+        if (pr) { cols.push('min/km'); pr.forEach(function (x, i) { rows[i].push(x); }); }
+        wrap.append(block('Laafen', stand(R, (hr ? 'Puls ' + hr + ' bpm' : '') + (hr && p ? ' · ' : '') + (p ? 'Pace ' + R.thr_pace + ' /km' : '')), cols, rows,
+          'Pace-Zonen als Prozent vun der Schwell-Pace (Z1 méi lues wéi 129 %, Z5c méi séier wéi 90 %); Puls-Zonen no Friel.'));
+        any = true;
+      }
+      var B = last('Rad', function (r) { return r.thr_hr || r.thr_watt; });
+      if (B) {
+        var bh = +B.thr_hr, w = +B.thr_watt, bhr = bh ? hrRows(bh, [.81, .90, .94, 1.00, 1.03, 1.06]) : null;
+        var cp = [.55, .75, .90, 1.05, 1.20, 1.50], N7 = ['Z1', 'Z2', 'Z3', 'Z4', 'Z5', 'Z6', 'Z7'];
+        var wr = w ? N7.map(function (n, i) {
+          var lo = i ? Math.round(w * cp[i - 1]) + 1 : null, hi = i < 6 ? Math.round(w * cp[i]) : null;
+          return lo == null ? '< ' + (hi + 1) : hi == null ? '> ' + (lo - 1) : lo + '–' + hi;
+        }) : null;
+        var bc = [], br = HRN.map(function (n, i) { return [n]; });
+        if (bhr) { bc.push('bpm'); bhr.forEach(function (x, i) { br[i].push(x); }); }
+        var rows2 = [];
+        if (bhr) rows2 = br;
+        var d2 = block('Vëlo', stand(B, (bh ? 'Puls ' + bh + ' bpm' : '') + (bh && w ? ' · ' : '') + (w ? 'FTP ' + w + ' W' : '')), bc, rows2,
+          'Watt-Zonen nom Coggan, Prozent vun der FTP. Puls-Zonen no Friel (Vëlo).');
+        if (wr) {
+          var g2 = el('div', 'an-zg'); g2.style.gridTemplateColumns = '34px 1fr';
+          g2.append(el('span', 'an-zh', ''), el('span', 'an-zh', 'Watt'));
+          wr.forEach(function (x, i) { g2.append(el('span', 'an-zn', N7[i]), el('span', null, x)); });
+          d2.insertBefore(g2, d2.querySelector('.an-zt'));
+        }
+        wrap.append(d2); any = true;
+      }
+      var S = last('Schwammen', function (r) { return r.thr_hr || r.thr_pace; });
+      if (S) {
+        var sh = +S.thr_hr, c = sec(S.thr_pace), sr = sh ? hrRows(sh, [.85, .90, .95, 1.00, 1.02, 1.06]) : null;
+        var off = [15, 8, 3, -2], N5 = ['Z1', 'Z2', 'Z3', 'Z4', 'Z5'];
+        var pz = c ? N5.map(function (n, i) {
+          return i === 0 ? '> ' + mmss(c + 15) : i === 4 ? '< ' + mmss(c - 2) : mmss(c + off[i]) + '–' + mmss(c + off[i - 1]);
+        }) : null;
+        var d3 = block('Schwammen', stand(S, (sh ? 'Puls ' + sh + ' bpm' : '') + (sh && c ? ' · ' : '') + (c ? 'CSS ' + S.thr_pace + ' /100 m' : '')),
+          sh ? ['bpm'] : [], sh ? HRN.map(function (n, i) { return [n, sr[i]]; }) : [],
+          'Faustregel: Pace-Zonen relativ zur CSS (Z1 méi lues wéi + 15 s, Z5 méi séier wéi − 2 s pro 100 m), keng genee Wëssenschaft. Puls-Zonen wéi beim Laafen. D’Schwamm-Schwell kënnt aus der aktueller Schwell-Datei.');
+        if (pz) {
+          var g3 = el('div', 'an-zg'); g3.style.gridTemplateColumns = '34px 1fr';
+          g3.append(el('span', 'an-zh', ''), el('span', 'an-zh', 'min/100 m'));
+          pz.forEach(function (x, i) { g3.append(el('span', 'an-zn', N5[i]), el('span', null, x)); });
+          d3.insertBefore(g3, d3.querySelector('.an-zt'));
+        }
+        wrap.append(d3); any = true;
+      }
+      wrap.append(el('p', 'an-how', '<strong>Wéi liesen:</strong> Zone 1–2 ass liicht (kann een nach schwätzen), Zone 3 mëttel, Zone 4 ronderëm d’Schwell, Zone 5 ganz haart. Déi meescht Zäit gehéiert an Zone 1–2. D’Zuelen änneren sech, wann eng nei Schwell agedron gëtt.'));
+      if (any) s2.parentNode.insertBefore(wrap, s2.nextSibling);
+    })();
+
     // Gëtt et besser?
     var s3 = section('Gëtt et besser?');
     s3.classList.add('an-two');
