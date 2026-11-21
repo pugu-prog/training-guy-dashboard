@@ -376,6 +376,20 @@
         data: { labels: fw.map(function (r) { return day(r.d); }), datasets: [{ label: 'Form', data: fw.map(function (r) { return +r.tsb.toFixed(1); }),
           backgroundColor: fw.map(function (r) { return r.tsb >= 0 ? '#1d9e75' : r.tsb >= -30 ? '#ef9f27' : '#d85a5a'; }), borderRadius: 1 }] },
         options: { scales: { x: { grid: { display: false }, ticks: { autoSkipPadding: 16, maxRotation: 0 } } }, plugins: { legend: { display: false } } } });
+      // Rampenrate (Aenderung vun der Fitness pro Woch) an Akut:Chronisch (Middegkeet : Fitness) als Korridor
+      var c7 = fd.length > 8 ? fd[fd.length - 8].ctl : null, ramp = c7 == null ? null : fl.ctl - c7, acwr = fl.ctl >= 5 ? fl.atl / fl.ctl : null;
+      var rcol = ramp == null ? MUTED : ramp > 8 ? BAD : ramp > 5 ? MID : GOOD, rtxt = ramp == null ? '—' : (ramp > 0 ? '+' : '') + num(ramp, 1);
+      var rlab = ramp == null ? '' : ramp > 8 ? 'ze séier, Gefor vun Iwwerbelaaschtung' : ramp > 5 ? 'flott, awer opgepasst' : ramp > 0.5 ? 'roueg Opbau' : ramp >= -0.5 ? 'stabil' : 'Fitness fält';
+      var acol = acwr == null ? MUTED : acwr < 0.8 ? '#378add' : acwr <= 1.3 ? GOOD : acwr <= 1.5 ? MID : BAD;
+      var alab = acwr == null ? '' : acwr < 0.8 ? 'manner wéi gewinnt' : acwr <= 1.3 ? 'am gréngen Beräich' : acwr <= 1.5 ? 'méi wéi gewinnt' : 'staark iwwer dem Normal';
+      var bf3 = card(s1b, 'Rampe a Belaaschtung', 'Rampe <b>' + rtxt + '</b> Punkten pro Woch' + (rlab ? ' – ' + rlab : '') + '. Verhältnis <b>' + (acwr == null ? '—' : num(acwr, 2)) + '</b>' + (alab ? ' – ' + alab : '') + '.',
+        'D’Rampe seet, wéi séier d’Fitness an der leschter Woch geklomme ass: bis ongeféier +5 ass roueg, +5 bis +8 flott, driwwer riskéiert een sech ze iwwerfuerderen. D’Verhältnis vergläicht d’lescht 7 Deeg (Middegkeet) mat de leschte ~6 Wochen (Fitness): 0,8 bis 1,3 ass de gréngen Beräich, drënner trainéiert een manner wéi gewinnt, driwwer wiisst d’Verletzungsrisiko. Berechent mat der hrTSS (net mat der Coros-Zuel), dofir si Wäerter méi kleng wéi an der Coros-App.', true);
+      bf3.style.height = 'auto';
+      var pos = acwr == null ? null : Math.min(acwr, 2) / 2 * 100;
+      bf3.innerHTML = '<div class="an-cor"><div class="an-cor-bar"><i style="width:40%;background:#cfe0f5"></i><i style="width:25%;background:#b7e3d1"></i><i style="width:10%;background:#f6dfb3"></i><i style="width:25%;background:#f2c4c4"></i>' +
+        (pos == null ? '' : '<b class="an-cor-mark" style="left:' + pos.toFixed(1) + '%;background:' + acol + '"></b>') + '</div>' +
+        '<div class="an-cor-lab"><span style="left:0">0</span><span style="left:40%">0,8</span><span style="left:65%">1,3</span><span style="left:100%">2</span></div></div>' +
+        '<div class="an-ramp"><span style="color:' + rcol + '">' + rtxt + '</span><small>Punkten Fitness pro Woch</small></div>';
 } } catch (e) { /* Fitness-Sektioun ass optionell */ }
 
     var s2 = section('Wéi ustrengend ass mäin Training?');
@@ -480,6 +494,35 @@
         (lr.thr_hr || '—') + '</b>. Bei deem Laf war doduerch <b>' + (lr.z5_pct != null ? num(lr.z5_pct, 0) + ' %' : '—') + '</b> vun der Zäit rout (ganz schwéier): ass dat vill, ass d’Schwell eventuell ze déif agestallt.'));
       root.append(f);
     }
+
+    // Bestleeschtungen (aus den Auer-Dateien): beschten Segment pro Distanz, mat Datum an Trend
+    try {
+      var runs = ses.filter(function (r) { return r.sport === 'Laafen'; }), nowd = new Date(), d90 = new Date(nowd.getTime() - 90 * 864e5).toISOString().slice(0, 10);
+      function fmtT(s) { s = Math.round(s); var h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), x = s % 60; return h ? h + ':' + String(m).padStart(2, '0') + ':' + String(x).padStart(2, '0') : m + ':' + String(x).padStart(2, '0'); }
+      function fmtP(s, km) { var p = s / km; return Math.floor(p / 60) + ':' + String(Math.round(p % 60)).padStart(2, '0') + ' /km'; }
+      var DIST = [['best_1km_s', '1 km', 1], ['best_5km_s', '5 km', 5], ['best_10km_s', '10 km', 10], ['best_hm_s', 'Hallefmarathon', 21.0975]];
+      var sPR = section('Bestleeschtungen');
+      var prBox = card(sPR, 'Beschten Zäiten', 'Dee beschte Segment pro Distanz aus all Läf mat Auer-Datei.',
+        'D’Zäit gëllt fir de beschte Stéck vun där Längt an engem Laf (och wann de Laf méi laang war). „Lescht 90 Deeg“ weist, wou s de aktuell stees. Wéi vill besser oder méi lues wéi de Rekord, steet an Klammeren.', true);
+      prBox.className = 'an-prbox'; prBox.style.height = 'auto';
+      var tiles = '';
+      DIST.forEach(function (d) {
+        var rs = runs.filter(function (r) { return r[d[0]] != null; });
+        if (!rs.length) return;
+        var best = rs.reduce(function (m, r) { return r[d[0]] < m[d[0]] ? r : m; }, rs[0]);
+        var prev = rs.filter(function (r) { return r.id < best.id; }).reduce(function (m, r) { return m == null || r[d[0]] < m[d[0]] ? r : m; }, null);
+        var rec = rs.filter(function (r) { return r.date >= d90; });
+        var rb = rec.length ? rec.reduce(function (m, r) { return r[d[0]] < m[d[0]] ? r : m; }, rec[0]) : null;
+        tiles += '<div class="an-tile"><span>' + d[1] + '</span><b>' + fmtT(best[d[0]]) + '</b><small>' + day(best.date) + ' · ' + fmtP(best[d[0]], d[2]) +
+          (prev ? '<br>virdrun ' + fmtT(prev[d[0]]) + ' (' + day(prev.date) + ', −' + Math.round(prev[d[0]] - best[d[0]]) + ' s)' : '') +
+          '<br>lescht 90 Deeg: ' + (rb ? fmtT(rb[d[0]]) + (rb === best ? ' (de Rekord)' : ' (+' + Math.round(rb[d[0]] - best[d[0]]) + ' s)') : '—') + '</small></div>';
+      });
+      var lr = runs.reduce(function (m, r) { return m == null || r.km > m.km ? r : m; }, null);
+      var rides = ses.filter(function (r) { return r.sport === 'Rad'; }), lrd = rides.reduce(function (m, r) { return m == null || r.km > m.km ? r : m; }, null);
+      if (lr) tiles += '<div class="an-tile"><span>Längste Laf</span><b>' + num(lr.km, 1) + ' km</b><small>' + day(lr.date) + ' · ' + hm(lr.time_min) + ' h</small></div>';
+      if (lrd) tiles += '<div class="an-tile"><span>Längst Vëlofaart</span><b>' + num(lrd.km, 1) + ' km</b><small>' + day(lrd.date) + ' · ' + hm(lrd.time_min) + ' h</small></div>';
+      prBox.innerHTML = '<div class="an-prgrid">' + tiles + '</div>';
+    } catch (e) { /* Bestleeschtungen sinn optionell */ }
 
     // Tabell
     root.append(el('h2', null, 'All Trainingen mat Auer-Datei'));

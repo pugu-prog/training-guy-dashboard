@@ -51,3 +51,16 @@
 .an-compact .c-x { display: none; }
 .an-wk-compact .wk-more { display: none; }
 .an-more { display: block; margin: 10px auto 2px; padding: 9px 16px; border: 1px solid #d9d7cd; background: #ffffff; color: #1a1a18; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; }
+
+/* Phase 3 / Stufe A: Rampe a Belaaschtung, Bestleeschtungen */
+.an-cor { margin: 14px 4px 22px; }
+.an-cor-bar { position: relative; display: flex; height: 14px; border-radius: 7px; overflow: visible; }
+.an-cor-bar i { display: block; height: 100%; }
+.an-cor-bar i:first-child { border-radius: 7px 0 0 7px; } .an-cor-bar i:nth-child(4) { border-radius: 0 7px 7px 0; }
+.an-cor-mark { position: absolute; top: -4px; width: 6px; height: 22px; margin-left: -3px; border-radius: 3px; box-shadow: 0 0 0 2px #ffffff; }
+.an-cor-lab { position: relative; height: 14px; margin-top: 6px; font-size: 11px; color: #8a8983; }
+.an-cor-lab span { position: absolute; transform: translateX(-50%); }
+.an-cor-lab span:first-child { transform: none; } .an-cor-lab span:last-child { transform: translateX(-100%); }
+.an-ramp { text-align: center; } .an-ramp span { font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums; } .an-ramp small { display: block; font-size: 11.5px; color: #8a8983; }
+.an-prgrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.an-prbox { position: relative; }
