@@ -139,11 +139,12 @@
         datasets: [
           { label: 'Laafen', data: wh.map(function (w) { return w.laafen; }), backgroundColor: 'rgb(' + COL.laaf + ')', stack: 's' },
           { label: 'Vëlo', data: wh.map(function (w) { return w.velo; }), backgroundColor: 'rgb(' + COL.velo + ')', stack: 's' },
-          { label: 'Schwammen', data: wh.map(function (w) { return w.schwammen; }), backgroundColor: 'rgb(' + COL.schwamm + ')', stack: 's' }] },
+          { label: 'Schwammen (rietsch)', type: 'line', yAxisID: 'y1', data: wh.map(function (w) { return w.schwammen; }), borderColor: 'rgb(' + COL.schwamm + ')', backgroundColor: 'rgb(' + COL.schwamm + ')', pointRadius: 3.5, borderWidth: 2, tension: 0.2 }] },
       options: { responsive: true, maintainAspectRatio: false,
-        scales: { x: { stacked: true, grid: { display: false } }, y: { stacked: true, beginAtZero: true, title: { display: true, text: 'km', font: { size: 11 } } } },
+        scales: { x: { stacked: true, grid: { display: false } }, y: { stacked: true, beginAtZero: true, title: { display: true, text: 'Laafen + Vëlo (km)', font: { size: 11 } } },
+          y1: { position: 'right', beginAtZero: true, grid: { display: false }, title: { display: true, text: 'Schwammen (km)', color: 'rgb(' + COL.schwamm + ')', font: { size: 11 } }, ticks: { color: 'rgb(' + COL.schwamm + ')' } } },
         plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, boxHeight: 10, font: { size: 11 } } },
-          tooltip: { callbacks: { footer: function (it) { var t = 0; it.forEach(function (i) { t += i.raw; }); return 'Zesummen ' + nf(t, 1) + ' km'; } } } } }
+          tooltip: { callbacks: { footer: function (it) { var t = 0; it.forEach(function (i) { if (i.dataset.yAxisID !== 'y1') t += i.raw; }); return 'Laafen + Vëlo ' + nf(t, 1) + ' km'; } } } } }
     });
   }
 
