@@ -37,6 +37,13 @@
    "km": 117.5,
    "last_run": "2026-10-09",
    "state": "ok"
+  },
+  {
+   "nick": "Nylotoni",
+   "model": "Saucony Endorphin Speed 5",
+   "km": 180.1,
+   "last_run": null,
+   "state": "ok"
   }
  ],
  "updated": "2026-11-21"
