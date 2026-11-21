@@ -46,3 +46,8 @@
   @media (min-width: 640px) { .an-grid.an-two { grid-template-columns: 1fr 1fr; } }
   .an-table.an-weeks th:nth-child(2), .an-table.an-weeks td:nth-child(2) { text-align: right; }
   .an-table th:first-child, .an-table td:first-child { padding-left: 16px; } .an-table th:last-child, .an-table td:last-child { padding-right: 16px; }
+
+/* Kuerz Usiicht: Tabellen */
+.an-compact .c-x { display: none; }
+.an-wk-compact .wk-more { display: none; }
+.an-more { display: block; margin: 10px auto 2px; padding: 9px 16px; border: 1px solid #d9d7cd; background: #ffffff; color: #1a1a18; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; }

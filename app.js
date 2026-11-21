@@ -25,6 +25,21 @@
   window.addEventListener('hashchange', function () { showTab(); if ((location.hash || '') !== '#formular') window.scrollTo(0, 0); });
   showTab();
 
+  // ---- Auto-Update: ass d'Säit um Server nei (z. B. vum Sync), eemol nei lueden (Home-Bildschierm-App cache't haart) ----
+  (function () {
+    try {
+      var mine = document.lastModified, key = 'tg_reload';
+      fetch(location.pathname, { method: 'HEAD', cache: 'no-store' }).then(function (r) {
+        var lm = r.headers.get('last-modified'); if (!lm) return;
+        if (new Date(lm).getTime() - new Date(mine).getTime() > 2000 && sessionStorage.getItem(key) !== lm) {
+          sessionStorage.setItem(key, lm);
+          Promise.all(['app.js', 'app.css', 'analyse.js', 'analyse.css'].map(function (f) { return fetch(f, { cache: 'reload' }); }))
+            .then(function () { return fetch(location.pathname, { cache: 'reload' }); }).then(function () { location.reload(); });
+        }
+      }).catch(function () {});
+    } catch (e) {}
+  })();
+
   // ---- Dag-Raster liesen ----
   function cards() { return [].slice.call(document.querySelectorAll('#tab-woche .days > .day')); }
   function info(c) {

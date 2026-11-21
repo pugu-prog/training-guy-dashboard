@@ -1,5 +1,5 @@
 /* Phase 2: Tab-Leiste, Heute, Wochenring, Schong */
-body { padding-bottom: calc(84px + env(safe-area-inset-bottom)); }
+body { padding-bottom: calc(104px + env(safe-area-inset-bottom)); }
 .tabpanel { display: none; }
 body:not([class*="tab-"]) #tab-heute, body.tab-heute #tab-heute, body.tab-woche #tab-woche,
 body.tab-verlauf #tab-verlauf, body.tab-material #tab-material,
@@ -7,10 +7,10 @@ body.tab-alles #tab-woche, body.tab-alles #tab-verlauf, body.tab-alles #tab-mate
 .hd-form { display: block; text-align: center; margin: 0 0 12px; padding: 12px 14px; border-radius: 12px; background: #0f6e56; color: #fff; font-weight: 600; font-size: 14px; text-decoration: none; }
 h2.first { margin-top: 0; }
 .bnav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; display: flex; background: #ffffff; border-top: 1px solid #e3e1d9;
-  padding: 4px 4px calc(4px + env(safe-area-inset-bottom)); }
-.bnav a { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 2px 4px; border-radius: 10px;
-  font-size: 11px; font-weight: 600; color: #6b6a64; text-decoration: none; }
-.bnav svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  padding: 8px 4px calc(14px + env(safe-area-inset-bottom)); }
+.bnav a { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 9px 2px 7px; border-radius: 12px;
+  font-size: 12px; font-weight: 600; color: #6b6a64; text-decoration: none; }
+.bnav svg { width: 27px; height: 27px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .bnav a[aria-current="page"] { color: #0f6e56; background: #e1f5ee; }
 @media (min-width: 760px) { .bnav { left: 50%; right: auto; width: 720px; transform: translateX(-50%); border-radius: 14px 14px 0 0; border: 1px solid #e3e1d9; border-bottom: none; } }
 

@@ -314,13 +314,20 @@
     var ktb = el('div', 'an-tablebox'), ktt = el('table', 'an-table an-weeks');
     ktt.innerHTML = '<thead><tr><th>Woch vum</th><th>Laafen</th><th>Vëlo</th><th>Schwammen</th><th>Kraft</th>' + (mob.length ? '<th>Mobilitéit</th>' : '') + '<th>Total Stonnen</th></tr></thead>';
     var ktbody = el('tbody');
-    wk.slice().reverse().forEach(function (r) {
-      var tr = el('tr');
+    wk.slice().reverse().forEach(function (r, ri) {
+      var tr = el('tr'); if (ri >= 8) tr.className = 'wk-more';
       [day(r.week) + ' ' + r.week.slice(0, 4), num(r.km.Laafen, 1) + ' km', num(r.km.Rad, 1) + ' km', num(r.km.Schwammen, 2) + ' km', hm(r.Kraft * 60) + ' h'].concat(mob.length ? [hm(r.Mobilitéit * 60) + ' h'] : [], [num(wtot(r), 1) + ' h'])
         .forEach(function (v) { var td = el('td'); td.textContent = v; tr.append(td); });
       ktbody.append(tr);
     });
-    ktt.append(ktbody); ktb.append(ktt); kt.append(ktb); s1.append(kt);
+    ktt.append(ktbody); ktb.append(ktt); kt.append(ktb);
+    if (wk.length > 8) {
+      ktt.classList.add('an-wk-compact');
+      var kbtn = el('button', 'an-more', 'Alle ' + wk.length + ' Wochen weisen'); kbtn.type = 'button';
+      kbtn.addEventListener('click', function () { var c = ktt.classList.toggle('an-wk-compact'); kbtn.textContent = c ? 'Alle ' + wk.length + ' Wochen weisen' : 'Manner weisen'; });
+      kt.append(kbtn);
+    }
+    s1.append(kt);
 
     // Mobilitéit & Stabi: Minutte pro Dag, lescht 28 Deeg
     if (mob.length) {
@@ -494,10 +501,12 @@
       ['gear', 'Material', function (r) { return r.gear || ''; }, 'l'],
       ['note', 'Bemierkung', function (r) { return r.note || ''; }, 'l']
     ];
+    var EXTRA = { ef: 1, drift_pct: 1, load: 1, np: 1, gear: 1, note: 1 }, compact = true, LIMIT = 12;
+    tbl.classList.add('an-compact');
     var sortKey = 'date', sortDir = -1;
     var thead = el('thead'), hr = el('tr'), tbody = el('tbody');
     COLS.forEach(function (c) {
-      var th = el('th', c[3] || null), bt = el('button', null, esc(c[1]));
+      var th = el('th', ((c[3] || '') + (EXTRA[c[0]] ? ' c-x' : '')).trim() || null), bt = el('button', null, esc(c[1]));
       bt.type = 'button';
       bt.addEventListener('click', function () {
         sortDir = c[0] === sortKey ? -sortDir : (c[0] === 'date' ? -1 : 1);
@@ -517,14 +526,20 @@
         if (va == null) return 1; if (vb == null) return -1;
         return (typeof va === 'number' ? va - vb : String(va).localeCompare(String(vb))) * sortDir;
       });
-      tbody.replaceChildren.apply(tbody, rows.map(function (r) {
+      tbody.replaceChildren.apply(tbody, (compact ? rows.slice(0, LIMIT) : rows).map(function (r) {
         var tr = el('tr');
-        COLS.forEach(function (c) { var td = el('td', c[3] || null); td.textContent = c[2](r); tr.append(td); });
+        COLS.forEach(function (c) { var td = el('td', ((c[3] || '') + (EXTRA[c[0]] ? ' c-x' : '')).trim() || null); td.textContent = c[2](r); tr.append(td); });
         return tr;
       }));
     }
     fill();
     tbl.append(thead, tbody); tb.append(tbl); tc.append(tb);
+    var sbtn = el('button', 'an-more', 'Alles weisen (' + ses.length + ' Trainingen, all Spalten)'); sbtn.type = 'button';
+    sbtn.addEventListener('click', function () {
+      compact = !compact; tbl.classList.toggle('an-compact', compact); fill();
+      sbtn.textContent = compact ? 'Alles weisen (' + ses.length + ' Trainingen, all Spalten)' : 'Manner weisen';
+    });
+    tc.append(sbtn);
     root.append(tc);
   }
 })();
