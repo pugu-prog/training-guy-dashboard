@@ -1,0 +1,51 @@
+/* Phase 2: Tab-Leiste, Heute, Wochenring, Schong */
+body { padding-bottom: calc(84px + env(safe-area-inset-bottom)); }
+.tabpanel { display: none; }
+body:not([class*="tab-"]) #tab-heute, body.tab-heute #tab-heute, body.tab-woche #tab-woche,
+body.tab-verlauf #tab-verlauf, body.tab-material #tab-material { display: block; }
+h2.first { margin-top: 0; }
+.bnav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; display: flex; background: #ffffff; border-top: 1px solid #e3e1d9;
+  padding: 4px 4px calc(4px + env(safe-area-inset-bottom)); }
+.bnav a { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 2px 4px; border-radius: 10px;
+  font-size: 11px; font-weight: 600; color: #6b6a64; text-decoration: none; }
+.bnav svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.bnav a[aria-current="page"] { color: #0f6e56; background: #e1f5ee; }
+@media (min-width: 760px) { .bnav { left: 50%; right: auto; width: 720px; transform: translateX(-50%); border-radius: 14px 14px 0 0; border: 1px solid #e3e1d9; border-bottom: none; } }
+
+.hd { margin-bottom: 12px; }
+.hd-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+.hd-day { font-size: 15px; font-weight: 600; }
+.hd-desc { font-size: 14px; color: #4a4944; line-height: 1.55; white-space: pre-line; }
+.hd-state { margin-top: 10px; padding-top: 10px; border-top: 1px dashed #e3e1d9; font-size: 14px; font-weight: 600; }
+.hd-state.done { color: #085041; } .hd-state.open { color: #854f0b; } .hd-state.off { color: #a32d2d; } .hd-state.rest { color: #6b6a64; }
+.hd-state small { display: block; font-weight: 400; color: #8a8983; font-size: 12px; margin-top: 2px; }
+.hd-next { margin-top: 8px; font-size: 12.5px; color: #6b6a64; }
+.hd-title { font-size: 12px; color: #6b6a64; margin: 0 0 8px; }
+.ring-row { display: flex; align-items: center; gap: 16px; }
+.ring { position: relative; width: 84px; height: 84px; flex: none; }
+.ring svg { width: 84px; height: 84px; transform: rotate(-90deg); }
+.ring circle { fill: none; stroke-width: 9; }
+.ring .bg { stroke: #efeee8; } .ring .fg { stroke: #1d9e75; stroke-linecap: round; transition: stroke-dasharray .4s; }
+.ring b { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.ring-side { flex: 1; min-width: 0; }
+.ring-side p { margin: 0 0 2px; font-size: 13px; color: #4a4944; }
+.ring-side p b { font-size: 16px; font-weight: 600; color: #1a1a18; font-variant-numeric: tabular-nums; }
+.dots { display: flex; gap: 6px; margin-top: 10px; }
+.dot { flex: 1; text-align: center; font-size: 10.5px; color: #8a8983; }
+.dot i { display: block; width: 100%; max-width: 30px; aspect-ratio: 1; margin: 0 auto 3px; border-radius: 50%; border: 2px solid #d9d7cd; background: #fff; }
+.dot.done i { background: #1d9e75; border-color: #1d9e75; } .dot.off i { border-color: #d85a5a; background: #fbe9e9; }
+.dot.rest i { background: #efeee8; border-color: #efeee8; } .dot.today { color: #1a1a18; font-weight: 700; } .dot.today i { box-shadow: 0 0 0 2px #378add; }
+.form-row { display: flex; align-items: center; gap: 12px; }
+.form-row .lamp { width: 14px; height: 14px; border-radius: 50%; flex: none; }
+.form-row .lamp.g { background: #1d9e75; } .form-row .lamp.o { background: #ef9f27; } .form-row .lamp.r { background: #d85a5a; }
+.form-row p { margin: 0; font-size: 13.5px; color: #1a1a18; } .form-row small { display: block; color: #8a8983; font-size: 12px; margin-top: 2px; }
+.shoe { margin-bottom: 12px; }
+.shoe-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.shoe-head b { font-size: 14px; font-weight: 600; } .shoe-head span { font-size: 13px; font-variant-numeric: tabular-nums; color: #4a4944; }
+.shoe small { display: block; color: #8a8983; font-size: 12px; margin-top: 2px; }
+.bar { position: relative; height: 10px; border-radius: 6px; background: #efeee8; margin: 8px 0 4px; overflow: hidden; }
+.bar i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 6px; background: #1d9e75; }
+.bar.warn i { background: #ef9f27; } .bar.red i { background: #d85a5a; }
+.shoe-tag { display: inline-block; margin-top: 4px; font-size: 11.5px; font-weight: 600; padding: 2px 8px; border-radius: 6px; }
+.shoe-tag.warn { background: #faeeda; color: #854f0b; } .shoe-tag.red { background: #fbe9e9; color: #a32d2d; }
+.shoe-cur { display: inline-block; font-size: 10.5px; font-weight: 600; background: #e1f5ee; color: #085041; padding: 1px 7px; border-radius: 10px; margin-left: 6px; vertical-align: 1px; }

@@ -32,6 +32,29 @@
   window.addEventListener('hashchange', showTab);
   showTab();
 
+  // ---- Fir d'Heute-Kaart (app.js): Form NËMMEN wann de Schlëssel um Apparat gespäichert ass; kee UI, näischt onverschlësselt ----
+  function formNow(data) {
+    var ses = data.sessions || [], fload = {};
+    ses.forEach(function (r) { if (r.load) fload[r.date] = (fload[r.date] || 0) + r.load; });
+    var fdk = Object.keys(fload).sort();
+    if (fdk.length < 5) return null;
+    var d0 = new Date(fdk[0] + 'T00:00:00Z'), dn = new Date(new Date().toISOString().slice(0, 10) + 'T00:00:00Z'), ctl = 0, atl = 0;
+    for (var dt = d0; dt <= dn; dt = new Date(dt.getTime() + 864e5)) {
+      var l = fload[dt.toISOString().slice(0, 10)] || 0;
+      ctl += (l - ctl) / 42; atl += (l - atl) / 7;
+    }
+    return { ctl: ctl, atl: atl, tsb: ctl - atl };
+  }
+  window.TrainingAnalyse = { silentForm: function () {
+    return fetch(ENC_URL + '?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (enc) {
+      if (!enc) return null;
+      return keyGet().then(function (saved) {
+        if (!saved || saved.salt !== enc.salt) return null;
+        return decrypt(saved.key, enc).then(formNow);
+      });
+    }).catch(function () { return null; });
+  } };
+
   // ---- Schlëssel um Apparat verhalen (IndexedDB, net exportéierbar) ----
   function idb(mode, fn) {
     return new Promise(function (res) {

@@ -15,6 +15,8 @@ Persönlechen Trainings-Dashboard vum Guy (Laafen, Vëlo, Kraft, Schwammen). Sta
 | `data/current-week.json` | Steiert de Sync: aktuell Woch, 7 Datumer, Baselines |
 | `sync_results.py` | Gëtt vun `.github/workflows/results-sync.yml` all 3 Stonnen (Cron `0 */3 * * *` UTC) gestart; schreift Jotform-Resultater an d'oppe Woch |
 | `training.ics` | Statesche Kalenner fir déi aktuell Woch |
+| `app.js`, `app.css` | Tab-Leiste, Heute-Kaart, Wochenring, Form-Ampel, Schong-Balken (béid Säiten). Liest nëmmen den Dag-Raster + `data/current-week.json` + `data/shoes.json`. No Ännerungen `?v=N` an béide HTML-Dateien eropsetzen. |
+| `data/shoes.json` | Schong-Kilometer (Numm, Modell, km, leschte Laf; keng Strava-Rohdaten). Gëtt AUTOMATESCH vun `~/Claude/Automatiounen/training-fit/shoes_update.py` geschriwwen (run.sh, all 30 Min., commit+push mam Mac-Git). Net vun Hand änneren. |
 | `analyse.js`, `analyse.css` | Tab "Analyse" (béid Säiten): entschlësselt `data/analyse.enc.json` am Browser a mécht d'Charts. No Ännerungen `?v=N` an béide HTML-Dateien eropsetzen (Cache). |
 | `data/analyse.enc.json` | FIT-Analyse, AES-256-GCM-verschlësselt (PBKDF2-SHA256, 600 000 Ronnen). Gëtt vun `analyse_verschlesselen.py` gemaach. |
 | `analyse_verschlesselen.py` | Liest `~/Claude/Apps/training-fit-cloud/bericht/{sessions,jotform}-Guy.json` (vu `bericht.py`) a verschlësselt se. Passwuert tippt de Guy selwer (getpass) |
@@ -22,7 +24,12 @@ Persönlechen Trainings-Dashboard vum Guy (Laafen, Vëlo, Kraft, Schwammen). Sta
 
 **Regel:** `index.html` an `trainer.html` ëmmer zesummen änneren (selwecht Day-Grid, Archiv, `WEEK_HISTORY`, Gesamt Iwwersiicht).
 
-**Seitenopbau (zënter 21.11.2026, Phase 1 „Seit kierzen“, Handy ca. 2700 px amplaz 5900):** Kapp → Tabs → Titel + 3 Stats + **aktuell Woch NËMMEN EEN Kéier** (`<div class="days" style="margin-top:16px;">`) → Menü (`#menuDetails`: Trainer-Link, iPhone-Hiwäis, Kalenner-.ics, Kraft-Programm; Trainer-Säit ouni Trainer-Link/iPhone/Kalenner) → „Auswertung“ → „Statistiken“ (Grafik `#statsDetails`) → „Gesamt Iwwersiicht“ → **Archiv** (NËMMEN ofgeschloss Wochen, déi 4 leschten eenzel, méi al am zouenen Block `#olderWeeks` „Ältere Wochen (N)“) → „Resultater aginn“ (`#formDetails`, Jotform-iFrame gëtt erëscht beim Opmaachen gelueden, `data-src`) → Footer. Kee oppenen Archiv-Entrée vun der aktueller Woch méi; `sync_results.py` schreift d'Resultater nëmmen an de Raster uewen (`apply_day_result`), `get_gesamt_section_scope` geet nëmmen iwwer de Stats-Block vun „Gesamt Iwwersiicht“. Archiv-Entrée vun enger ofgeschlossener Woch: `<details class="week"><summary>Woch N &middot; …</summary>`, `week-comment`, `stats-mini`, `<div class="days">` (Dag-Kaarten op eng Zeil).
+**Seitenopbau (zënter 21.11.2026, Phase 2 „Tabs“):** Kapp (h1, `.sub`) → 4 Panelen `<section class="tabpanel" id="tab-…">` am `.wrap` → Footer; **ënnen fixéiert Tab-Leiste** `<nav class="bnav" id="bnav">` (ausserhalb vum `.wrap`): **Heute · Woche · Verlauf · Analyse · Material** (Hash `#heute` `#woche` `#verlauf` `#analyse` `#material`; kee/onbekannte Hash = Heute, `#iwwersiicht` = Heute). Handy-Héichten: Heute ≈ 1 Écran, Woche ≈ 1200 px, Verlauf ≈ 1900 px, Material ≈ 1400 px. Inhalt:
+- `#tab-heute`: nëmmen `<div id="heute">`, gëtt vun `app.js` gefëllt (Haut-Kaart aus dem Dag-Raster, Wochenring Sessiounen gemaach/geplangt + 7 Punkten, Form-Ampel NËMMEN wann de Analyse-Schlëssel um Apparat gespäichert ass (`window.TrainingAnalyse.silentForm()` aus `analyse.js`), aktuell Schong aus `data/shoes.json`). Keng `day`/`stat`-Klassen do dran, domat de Sync se net beréiert.
+- `#tab-woche`: Titel „Trainingsprogramm Guy, Woch N“ + 3 Stats + **Dag-Raster** (`<div class="days" style="margin-top:16px;">`, NËMMEN EEN Kéier; `sync_results.py` schreift d'Resultater nëmmen hei).
+- `#tab-verlauf`: „Auswertung“ → „Statistiken“ (`#statsDetails`, gëtt beim Wiesselen op den Tab opgemaach, dann zeechent d'Grafik) → „Gesamt Iwwersiicht“ → **Archiv** (NËMMEN ofgeschloss Wochen, 4 leschten eenzel, méi al am Block `#olderWeeks`; `<p class="empty" id="archive-hint">` ass de Schluss).
+- `#tab-material`: „Schong“ (`#schuhe`, Balken pro Paar) → „Méi“ (`.menu-body`: Trainer-Link/iPhone-Hiwäis/Kalenner-.ics/Kraft-Programm; Trainer-Säit ouni Trainer-Link/iPhone/Kalenner) → „Resultater aginn“ (`#formDetails`, Jotform-iFrame erëscht beim Opmaachen, `data-src`; nëmmen index.html).
+`wochewiessel.py` hänkt vun dëser Struktur of: 1. `<div class="stats">`-Block direkt virun `<div class="days" style="margin-top:16px;">` (mat Leerzeil dertëscht), `<h2>Archiv</h2>` … `<p class="empty" id="archive-hint">`, `WEEK_HISTORY`-Zeil „Woch N“ als lescht. D'`<section>`-Wrapper stinn mat 2 Leerzeechen Aréckung; **Inhalt net nei aréckelen**. Archiv-Entrée vun enger ofgeschlossener Woch: `<details class="week"><summary>Woch N &middot; …</summary>`, `week-comment`, `stats-mini`, `<div class="days">` (Dag-Kaarten op eng Zeil).
 
 ## Tab "Analyse" (verschlësselt)
 
@@ -134,3 +141,9 @@ Zil: `.fit`-Dateien (Auer/Vëlo-Computer) importéieren, fir **exakt km pro Dag*
 - Ofhängegkeet: de PDF muss an `Plang/` landen (Guy kopéiert en dohinner), Mac un/wakeg. Net-erkannt Dag → Notifikatioun „kontrolléier …“. Test: `WW_REPO=<Klon op ale Stand> python3 wochewiessel.py --dry-run` (pusht näischt).
 - Handaarbecht (Woch ouni Plang, Plang-Ännerung mëtt an der Woch) bleift wéi uewen beschriwwen.
 - Den aale Scheduled Task `training-guy-wochewiessel` ass ofgeschalt, de Cowork-Skill `training-guy-dashboard-update` weist elo hei hin.
+
+## Schong (zënter 21.11.2026)
+
+- Master: `~/Claude/Automatiounen/training-fit/shoes_config.json` (Paar-Lëscht mat Spëtznimm, Startkilometer = Strava-Gear-Totalen bis 20.11.2026, `baseline_from`, Warnung 600 km, rout 800 km, `legacy_overrides`). Ab `baseline_from` zielt `shoes_update.py` d'Kilometer aus den FIT-Sessiounen (`context.shoe` am Cloud-Klon `training-fit-cloud/sessions/Guy`). **Kee Strava-Abruff op der Säit** (Strava erlaabt keng ëffentlech Usiicht vun de Rohdaten).
+- Dialog-/Kuerzbefehl-Lëscht: `state.json` „shoes“ (Mac) a `schong.txt` (Cloud), Format `Mark Modell Versioun – Spëtznumm` (`fit_feedback.split_shoe` schneit de Spëtznumm fir den PDF of). Neit Paar: Eintrag an `shoes_config.json` + Label an déi zwou Lëschten.
+- Test: `python3 shoes_update.py --dry-run` (dréckt d'JSON, pusht näischt).
