@@ -20,7 +20,9 @@ Persönlechen Trainings-Dashboard vum Guy (Laafen, Vëlo, Kraft, Schwammen). Sta
 | `analyse_verschlesselen.py` | Liest `~/Claude/Apps/training-fit-cloud/bericht/{sessions,jotform}-Guy.json` (vu `bericht.py`) a verschlësselt se. Passwuert tippt de Guy selwer (getpass) |
 | `manifest.json`, Icons, `.nojekyll` | änneren net |
 
-**Regel:** `index.html` an `trainer.html` ëmmer zesummen änneren (selwecht Day-Grid, Archiv, `WEEK_HISTORY`, Gesamt Iwwersiicht). All Woch steet an all HTML-Datei **zweemol**: uewen als aktuell Woch an als oppenen `<details class="week">` am Archiv. Ännerunge musse béid Plazen treffen.
+**Regel:** `index.html` an `trainer.html` ëmmer zesummen änneren (selwecht Day-Grid, Archiv, `WEEK_HISTORY`, Gesamt Iwwersiicht).
+
+**Seitenopbau (zënter 21.11.2026, Phase 1 „Seit kierzen“, Handy ca. 2700 px amplaz 5900):** Kapp → Tabs → Titel + 3 Stats + **aktuell Woch NËMMEN EEN Kéier** (`<div class="days" style="margin-top:16px;">`) → Menü (`#menuDetails`: Trainer-Link, iPhone-Hiwäis, Kalenner-.ics, Kraft-Programm; Trainer-Säit ouni Trainer-Link/iPhone/Kalenner) → „Auswertung“ → „Statistiken“ (Grafik `#statsDetails`) → „Gesamt Iwwersiicht“ → **Archiv** (NËMMEN ofgeschloss Wochen, déi 4 leschten eenzel, méi al am zouenen Block `#olderWeeks` „Ältere Wochen (N)“) → „Resultater aginn“ (`#formDetails`, Jotform-iFrame gëtt erëscht beim Opmaachen gelueden, `data-src`) → Footer. Kee oppenen Archiv-Entrée vun der aktueller Woch méi; `sync_results.py` schreift d'Resultater nëmmen an de Raster uewen (`apply_day_result`), `get_gesamt_section_scope` geet nëmmen iwwer de Stats-Block vun „Gesamt Iwwersiicht“. Archiv-Entrée vun enger ofgeschlossener Woch: `<details class="week"><summary>Woch N &middot; …</summary>`, `week-comment`, `stats-mini`, `<div class="days">` (Dag-Kaarten op eng Zeil).
 
 ## Tab "Analyse" (verschlësselt)
 
@@ -77,14 +79,14 @@ Zousaz an der Woch (z. B. "an och nach schwammen"): an der bestoender `.desc` ma
 
 1. PDF liesen, Datumer Méindeg–Sonndeg vun der neier Woch bestëmmen, all Dag klasséieren.
 2. **Al Woch ofschléissen** (an index.html + trainer.html):
-   - Hir Resultater sinn schonn am Archiv-Entrée (vum Sync). Op komplett kontrolléieren (Jotform).
-   - Direkt nom `<summary>` e `<p class="week-comment">` mat 2–3 Sätz derbäisetzen: gemaach/ausgelooss, km pro Sport, Ø HF, Ø Gefill, wat an de Bemierkungen opfält.
-   - Säin `<details>` zouklappen (kee `open`).
+   - Hir Resultater sinn schonn am Dag-Raster uewen (vum Sync). Op komplett kontrolléieren (Jotform); dono gëtt de Raster (Dag-Kaarten mat Resultater) d'Basis vum Archiv-Entrée.
+   - Am neien Archiv-Entrée direkt nom `<summary>` e `<p class="week-comment">` mat 2–3 Sätz derbäisetzen: gemaach/ausgelooss, km pro Sport, Ø HF, Ø Gefill, wat an de Bemierkungen opfält.
+   - Säin `<details>` ass zou (kee `open`).
    - Am `WEEK_HISTORY` déi definitiv Wäerter androen (laafen/velo/schwammen km, stonnen, total).
 3. **Nei Woch bauen:**
    - Uewen: "Aktuell Woch: Woch N &middot; 5. - 11. Oktober 2026", d'Stats-Kaarten (Sessiounen, Laafdeeg, Haaptsessiounen) an den Day-Grid.
    - `index.html`: Kaart "Trainingsprogramm Guy, Woch N".
-   - Archiv: neien oppenen `<details class="week">` mat `<summary>Woch N &middot; Datumberäich …</summary>` an `.stats-mini` op "0,0 km" / "0,0 h", uewen iwwer de fréiere Wochen. Al Woche **ni läschen**.
+   - Archiv: d'ALT Woch kënnt als zouenen Entrée uewen an d'Archiv (Resultater aus dem Raster, Kommentar, `.stats-mini` mat den definitive Totalen); déi nei Woch kritt KENG Archiv-Kopie. Wochen am Archiv: déi 4 leschten eenzel, den Rescht am Block `#olderWeeks`. Al Woche **ni läschen**. (De Skript `wochewiessel.py` mécht dat automatesch: `insert_archive`.)
    - `WEEK_HISTORY` an **béide** Dateien: `{ label: "Woch N", laafen: 0, velo: 0, schwammen: 0, stonnen: 0, total: 0 }`.
 4. ⚠️ **Bekannte Bug (scho 2× geschitt):** Ni Resultat-Markup (`<details class="result …">`, `result-off`) vun der aler Woch an déi nei Woch kopéieren. Déi nei Woch fänkt **ouni** Resultat-Blocken un, ausser et gëtt schonn eng richteg Submissioun mat engem Datum an där Woch.
 5. **`data/current-week.json` aktualiséieren (Pflicht!):** `week_number`, `week_label`, 7 `days` (Format `YYYYMMDD`), `hours_baseline`/`km_baseline` = al Baseline + exakt Totale vun der ofgeschlossener Woch (aus de Submissiounen summéiert, net déi gerënnt Wäerter vun der Säit), `activity_baselines` d'selwecht pro Sport (velo=Jotform "Rad", laafen, kraft (nëmmen Stonnen), schwammen). D'Zomm vun de 4 km muss genee `km_baseline` ginn. Wann een dëse Schrëtt vergësst, schreift de Sync weider an déi al Woch.

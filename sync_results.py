@@ -430,28 +430,19 @@ def get_top_grid_scope(html):
     return idx, end
 
 
-def get_open_archive_scope(html):
-    marker = '<details class="week" open>'
-    idx = html.find(marker)
-    if idx == -1:
-        raise ValueError("open Archiv week not found")
-    end = find_balanced(html, idx, "details")
-    return idx, end
-
-
 def apply_day_result(html, weekday, new_result_html):
-    """Sets (or clears) the result block for `weekday` in both the top
-    day-grid and the open Archiv week entry. Returns updated html."""
-    for scope_fn in (get_top_grid_scope, get_open_archive_scope):
-        scope_start, scope_end = scope_fn(html)
-        block = find_day_block(html[scope_start:scope_end], scope_start, weekday)
-        if not block:
-            continue
-        day_start, day_end = block
-        day_html = html[day_start:day_end]
-        new_day_html = set_result(day_html, new_result_html)
-        html = html[:day_start] + new_day_html + html[day_end:]
-    return html
+    """Sets (or clears) the result block for `weekday` in the day-grid of the
+    current week (top of the page). Since 2026-11-21 the current week exists
+    only ONCE (no open copy in the Archiv any more); the weekly changeover
+    (wochewiessel.py) builds the closed Archiv entry from the final grid."""
+    scope_start, scope_end = get_top_grid_scope(html)
+    block = find_day_block(html[scope_start:scope_end], scope_start, weekday)
+    if not block:
+        return html
+    day_start, day_end = block
+    day_html = html[day_start:day_end]
+    new_day_html = set_result(day_html, new_result_html)
+    return html[:day_start] + new_day_html + html[day_end:]
 
 
 def replace_stat_value(html, label, new_value, new_note=None):
@@ -498,39 +489,15 @@ def replace_label_value_in_segment(segment, label, new_value):
     return segment[:after] + new_value_html + segment[value_end:]
 
 
-def update_open_week_mini_stats(html, distanz_value, stonnen_value):
-    """Keeps the small "Distanz"/"Stonnen" stat-mini block under the
-    currently-open Archiv week's title in sync with the live totals for
-    that week. Added 2026-07 alongside the Gesamt Iwwersiicht section;
-    older archived weeks are left untouched (their totals are frozen once
-    the week is closed by the weekly skill)."""
-    try:
-        scope_start, scope_end = get_open_archive_scope(html)
-    except ValueError:
-        return html
-    segment = html[scope_start:scope_end]
-    idx = segment.find('<div class="stats-mini">')
-    if idx == -1:
-        return html  # older page without mini-stats yet, skip gracefully
-    window_end = segment.find('<div class="days">', idx)
-    if window_end == -1:
-        window_end = min(len(segment), idx + 400)
-    window = segment[idx:window_end]
-    window = replace_label_value_in_segment(window, "Distanz", distanz_value)
-    window = replace_label_value_in_segment(window, "Stonnen", stonnen_value)
-    new_segment = segment[:idx] + window + segment[window_end:]
-    return html[:scope_start] + new_segment + html[scope_end:]
-
-
 def get_gesamt_section_scope(html):
     marker = "<h2>Gesamt Iwwersiicht</h2>"
     idx = html.find(marker)
     if idx == -1:
         return None
-    end = html.find("<footer>", idx)
-    if end == -1:
+    stats = html.find('<div class="stats">', idx)
+    if stats == -1:
         return None
-    return idx, end
+    return idx, find_balanced(html, stats, "div")
 
 
 def update_gesamt_iwwersiicht(html, wochen, gesamt_km_value, gesamt_stonnen_value):
@@ -794,16 +761,9 @@ def apply_all(html, results, stats, week, hours_baseline, km_baseline, activity_
     total_hours = hours_baseline + stats["week_hours"]
     html = replace_stat_value(html, "Gesamt Stonnen", fmt_1dp(total_hours) + " h")
 
-    # Per-week mini-stats under the open Archiv week's title, and the
-    # all-time "Gesamt Iwwersiicht" section at the bottom of the page.
-    # Both are recomputed from scratch every run so they can never drift
-    # from the Auswertung stats above, regardless of how many automated
-    # syncs have run since the week started.
-    html = update_open_week_mini_stats(
-        html,
-        fmt_1dp(stats["distanz_total"]) + " km",
-        fmt_1dp(stats["week_hours"]) + " h",
-    )
+    # The "Gesamt Iwwersiicht" section at the page is recomputed from scratch
+    # every run so it can never drift from the Auswertung stats above,
+    # regardless of how many automated syncs have run since the week started.
 
     gesamt_km = km_baseline + stats["distanz_total"]
     html = update_gesamt_iwwersiicht(
