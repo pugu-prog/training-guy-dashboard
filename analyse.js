@@ -500,20 +500,22 @@
       }
       var S = last('Schwammen', function (r) { return r.thr_hr || r.thr_pace; });
       if (S) {
-        var sh = +S.thr_hr, c = sec(S.thr_pace), sr = sh ? hrRows(sh, [.85, .90, .95, 1.00, 1.02, 1.06]) : null;
-        var off = [15, 8, 3, -2], N5 = ['Z1', 'Z2', 'Z3', 'Z4', 'Z5'];
-        var pz = c ? N5.map(function (n, i) {
-          return i === 0 ? '> ' + mmss(c + 15) : i === 4 ? '< ' + mmss(c - 2) : mmss(c + off[i]) + '–' + mmss(c + off[i - 1]);
-        }) : null;
-        var d3 = block('Schwammen', stand(S, (sh ? 'Puls ' + sh + ' bpm' : '') + (sh && c ? ' · ' : '') + (c ? 'CSS ' + S.thr_pace + ' /100 m' : '')),
+        // Offizieller CSS-Test (Mike Heuschling, 19.11.2026): Schwellenpace 2:37 /100 m (CSS 2:32 × 1,035). Spéider Sessiounen bréngen hir eege Schwell mat.
+        var TEST = 157, sh = +S.thr_hr, tp = S.date > '2026-11-19' && sec(S.thr_pace) ? sec(S.thr_pace) : TEST;
+        var sr = sh ? hrRows(sh, [.85, .90, .95, 1.00, 1.02, 1.06]) : null;
+        var SZ = [['Z1', 'Regeneratioun', null, .85], ['Z2', 'LIT', .85, .93], ['Z3', 'Tempo', .93, .97], ['Z4', 'Schwell', .97, 1.035], ['Z5', 'HIT laang', 1.035, 1.10], ['Z6', 'HIT kuerz', 1.10, null]];
+        var d3 = block('Schwammen', 'Schwellenpace ' + mmss(tp) + ' /100 m' + (sh ? ' · Puls ' + sh + ' bpm (geschat)' : ''),
           sh ? ['bpm'] : [], sh ? HRN.map(function (n, i) { return [n, sr[i]]; }) : [],
-          'Faustregel: Pace-Zonen relativ zur CSS (Z1 méi lues wéi + 15 s, Z5 méi séier wéi − 2 s pro 100 m), keng genee Wëssenschaft. Puls-Zonen wéi beim Laafen. D’Schwamm-Schwell kënnt aus der aktueller Schwell-Datei.');
-        if (pz) {
-          var g3 = el('div', 'an-zg'); g3.style.gridTemplateColumns = '34px 1fr';
-          g3.append(el('span', 'an-zh', ''), el('span', 'an-zh', 'min/100 m'));
-          pz.forEach(function (x, i) { g3.append(el('span', 'an-zn', N5[i]), el('span', null, x)); });
-          d3.insertBefore(g3, d3.querySelector('.an-zt'));
-        }
+          'Quell: CSS-Test vum Mike Heuschling, 19.11.2026 (200 m 4:20, 400 m 9:24, CSS 2:32 /100 m, Schwellenpace = CSS × 1,035 = 2:37). Zonen aus Prozent vun der Schwellegeschwindegkeet. D’Puls-Schwell (150 bpm) ass eng Schätzung aus dem Pulsverlaf, d’Puls-Zonen wéi beim Laafen.');
+        var g3 = el('div', 'an-zg'); g3.style.gridTemplateColumns = '34px 1fr 1fr';
+        g3.append(el('span', 'an-zh', ''), el('span', 'an-zh', 'min/100 m'), el('span', 'an-zh', 'min/50 m'));
+        SZ.forEach(function (z) {
+          var slow = z[2] ? tp / z[2] : null, fast = z[3] ? tp / z[3] : null;   // Zäit = Pace-Schwell / Prozent
+          function q(v, k) { return mmss(k === 1 ? v : Math.round(Math.round(v) / 2)); }   // /50 m aus der gerundeter /100-m-Zäit
+          function f(k) { return z[2] == null ? '> ' + q(fast, k) : z[3] == null ? '< ' + q(slow, k) : q(fast, k) + '–' + q(slow, k); }
+          g3.append(el('span', 'an-zn', z[0]), el('span', null, f(1)), el('span', null, f(2)));
+        });
+        d3.insertBefore(g3, d3.firstChild.nextSibling);
         wrap.append(d3); any = true;
       }
       wrap.append(el('p', 'an-how', '<strong>Wéi liesen:</strong> Zone 1–2 ass liicht (kann een nach schwätzen), Zone 3 mëttel, Zone 4 ronderëm d’Schwell, Zone 5 ganz haart. Déi meescht Zäit gehéiert an Zone 1–2. D’Zuelen änneren sech, wann eng nei Schwell agedron gëtt.'));
