@@ -3,8 +3,8 @@
 (function () {
   var ENC_URL = 'data/analyse.enc.json';
   var SPORTS = ['Laafen', 'Rad', 'Schwammen', 'Kraft'];
-  var SNAME = { Laafen: 'Laafen', Rad: 'Vëlo', Schwammen: 'Schwammen', Kraft: 'Kraft', Mobilitéit: 'Mobilitéit & Stabi' };
-  var SCOL = { Laafen: '#1d9e75', Rad: '#ef9f27', Schwammen: '#2fa8c9', Kraft: '#7f77dd', Mobilitéit: '#c2748a' };
+  var SNAME = { Laafen: 'Laafen', Rad: 'Vëlo', Schwammen: 'Schwammen', Kraft: 'Kraft', Mobilitéit: 'Mobilitéit & Stabi', Spazéieren: 'Spazéieren' };
+  var SCOL = { Laafen: '#1d9e75', Rad: '#ef9f27', Schwammen: '#2fa8c9', Kraft: '#7f77dd', Mobilitéit: '#c2748a', Spazéieren: '#8c9a5b' };
   var HOURS = ['Laafen', 'Rad', 'Schwammen', 'Kraft', 'Mobilitéit'];   // Mobilitéit & Stabi kënnt just aus de FITen (Kuerzbefehl „Stabi FIT“)
   var GOOD = '#1d9e75', MID = '#e0b43a', BAD = '#d4574a', MUTED = '#b4b2a9', INK = '#1a1a18';
   var MON = ['Jan.', 'Feb.', 'Mäe.', 'Abr.', 'Mee', 'Juni', 'Juli', 'Aug.', 'Sep.', 'Okt.', 'Nov.', 'Dez.'];
@@ -200,6 +200,7 @@
     var since = jot.reduce(function (m, r) { return r.date < m ? r.date : m; }, '9999');
     var wk = weekly(jot, ses), full = wk.slice(0, -1);
     var mob = ses.filter(function (r) { return r.sport === 'Mobilitéit'; });
+    var walks = ses.filter(function (r) { return r.sport === 'Spazéieren'; });   // zielt net bei d'Trainingsstonnen an d'Form
     var it = intensity(ses), all = it.filter(function (r) { return r.sport === 'All'; })[0];
     var runs = ses.filter(function (r) { return r.sport === 'Laafen' && r.ef != null && r.time_min >= 10; });
     var eft = trend(runs, function (r) { return r.ef; });
@@ -253,6 +254,15 @@
         '<small>' + mob.length + ' Sessiounen' + aartTxt(mob) + '<br>Lescht: ' + day(mob.reduce(function (m, r) { return r.date > m ? r.date : m; }, '')) +
         (mnow.length ? '<br>Dës Woch: ' + Object.keys(mdays).length + ' Deeg \u00b7 ' + num(sum(mnow, function (r) { return r.time_min; }), 0) + ' min' : '') + '</small>';
       ps.append(mt);
+    }
+    if (walks.length) {
+      var snow = walks.filter(function (r) { return r.date >= wk0; });
+      var st = el('div', 'an-tile an-sport');
+      st.style.borderLeftColor = SCOL.Spazéieren;
+      st.innerHTML = '<span>' + SNAME.Spazéieren + '</span><b>' + num(sum(walks, function (r) { return r.km; }), 1) + ' km</b>' +
+        '<small>' + num(sum(walks, function (r) { return r.time_min; }) / 60, 1) + ' h \u00b7 ' + walks.length + ' Mol<br>Lescht: ' + day(walks.reduce(function (m, r) { return r.date > m ? r.date : m; }, '')) +
+        (snow.length ? '<br>Dës Woch: ' + num(sum(snow, function (r) { return r.km; }), 1) + ' km' : '') + '</small>';
+      ps.append(st);
     }
     root.append(ps);
 
@@ -344,6 +354,26 @@
           scales: { x: { grid: { display: false }, ticks: { autoSkipPadding: 8, maxRotation: 0 } }, y: { beginAtZero: true, ticks: { callback: function (v) { return v + ' min'; } } } },
           plugins: { legend: { display: false }, tooltip: { callbacks: { label: function (i) { var r = mob.filter(function (x) { return x.date === dd[i.dataIndex]; });
             return [num(i.raw, 0) + ' min'].concat(r.length && r[0].hr_avg ? ['Ø Puls ' + r[0].hr_avg] : []); } } } }
+        }
+      });
+    }
+
+    // Spazéieren: km pro Dag, lescht 28 Deeg
+    if (walks.length) {
+      var wd = [], w0 = new Date(new Date().toISOString().slice(0, 10) + 'T00:00:00Z');
+      for (var j = 27; j >= 0; j--) { var dj = new Date(w0); dj.setUTCDate(dj.getUTCDate() - j); wd.push(dj.toISOString().slice(0, 10)); }
+      var of = function (d) { return walks.filter(function (r) { return r.date === d; }); };
+      var wkm = wd.map(function (d) { return sum(of(d), function (r) { return r.km; }); });
+      var recent = walks.filter(function (r) { return r.date >= wd[0]; });
+      var bs = card(s1, SNAME.Spazéieren, 'Lescht 4 Wochen: <b>' + num(sum(recent, function (r) { return r.km; }), 1) + ' km</b> an <b>' + hm(sum(recent, function (r) { return r.time_min; })) + ' h</b> (' + recent.length + ' Mol).',
+        'All Balken ass en Dag, d\u2019H\u00e9icht sinn d\u2019Kilometer (aus der Auer). Spaz\u00e9ieren zielt net bei d\u2019Trainingsstonnen, d\u2019Punkten an d\u2019Form a steet net um Dashboard.', true);
+      chart(bs, {
+        type: 'bar',
+        data: { labels: wd.map(day), datasets: [{ label: SNAME.Spazéieren, data: wkm.map(function (v) { return +v.toFixed(2); }), backgroundColor: SCOL.Spazéieren, borderRadius: 2 }] },
+        options: {
+          scales: { x: { grid: { display: false }, ticks: { autoSkipPadding: 8, maxRotation: 0 } }, y: { beginAtZero: true, ticks: { callback: function (v) { return v + ' km'; } } } },
+          plugins: { legend: { display: false }, tooltip: { callbacks: { label: function (i) { var r = of(wd[i.dataIndex]);
+            return [num(i.raw, 1) + ' km'].concat(r.length ? [hm(sum(r, function (x) { return x.time_min; })) + ' h'] : [], r.length === 1 && r[0].hr_avg ? ['\u00d8 Puls ' + r[0].hr_avg] : []); } } } }
         }
       });
     }
